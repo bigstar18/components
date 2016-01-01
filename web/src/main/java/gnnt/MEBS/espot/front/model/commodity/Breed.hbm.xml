@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.commodity.Breed" table="M_Breed" dynamic-insert="true" dynamic-update="true">
+		<id name="breedID"/>
+		<property name="breedName"/>
+		<property name="unit" />
+		<property name="tradeMode" />
+		<property name="status" />
+		<property name="belongModule" />
+		<property name="sortNo" />
+		<property name="picture" type="org.springframework.orm.hibernate3.support.BlobByteArrayType"></property>
+		<many-to-one name="belongtoCategory" column="categoryID" class="gnnt.MEBS.espot.front.model.commodity.Category"/>
+		<set name="containBreedProps" cascade="none" lazy="false" order-by="sortNo asc">
+			<key column="breedID" />
+			<one-to-many class="gnnt.MEBS.espot.front.model.commodity.BreedProps" />
+		</set>
+	</class>
+</hibernate-mapping>

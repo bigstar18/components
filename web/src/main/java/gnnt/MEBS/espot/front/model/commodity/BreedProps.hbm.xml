@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.commodity.BreedProps" table="M_BreedProps" dynamic-insert="true" dynamic-update="true">
+		<composite-id>
+			<key-many-to-one name="belongtoBreed" column="breedID" class="gnnt.MEBS.espot.front.model.commodity.Breed"/>
+			<key-many-to-one name="belongtoProperty" column="propertyID" class="gnnt.MEBS.espot.front.model.commodity.Property"/>
+			<key-property name="propertyValue"/>
+		</composite-id>
+		<property name="sortNo"></property>
+	</class>
+</hibernate-mapping>

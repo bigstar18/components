@@ -1,0 +1,433 @@
+#!/bin/sh
+
+#########
+#
+# GT_VERSION=1.2.3
+#
+#########
+
+#防止重复引用
+if [ ! -z "${_INCLUDE_GNNT_LIB}" ]
+then
+	return 0
+else
+	_INCLUDE_GNNT_LIB="_INCLUDE_GNNT_LIB"
+fi
+
+
+#### 设置项 #####################################################
+## GT = company ，MP = MAIN_PATH
+
+## 是否强制指定版本
+FORCE_CHECK_VERSION="TRUE"
+
+#### 函数集 #####################################################
+## 检查环境
+# [in]: 无
+# [out]: GT_MP, GT_KEY_WORD, GT_PS_OPTION, GT_COL_NUM, GT_SYSTYPE, GT_USER_ID, GT_TAIL_OPTION
+gnnt_check_env()
+{
+	## 默认的系统类型为LINUX，可选HP-UX/LINUX/AIX
+	GT_SYSTYPE="LINUX"
+
+	## 如果系统是AIX，则进程号在进程列表中的长度为6位
+	rr=`uname -a | grep AIX | wc -l | tr -d ' '`
+	if [ "$rr" = "1" ]
+	then
+		GT_SYSTYPE="AIX"
+		GT_COL_NUM="10-15"
+	else
+		GT_COL_NUM="10-14"
+	fi
+
+	## ps , tail 命令选项，HP-UX比较特殊，这里默认是Linux
+	GT_PS_OPTION="-ef"
+	GT_TAIL_OPTION="-n0"
+
+	## 如果系统是HP-UX，则ps选项为-efx, tail不支持-n0
+	rr=`uname -a | grep "HP-UX" | wc -l | tr -d ' '`
+	if [ "$rr" = "1" ]
+	then
+		GT_SYSTYPE="HP-UX"
+		GT_PS_OPTION="-efx"
+		GT_TAIL_OPTION=""
+	fi
+
+	## 如果用户名在进程列表中不能显示，则表示名称过长，用户标识应使用数字编号
+	GT_USER_ID="[ ]*$USER"
+	GT_USER_ID_DISP="$USER"
+	if [ ${#USER} -gt 8 ]
+	then
+		GT_USER_ID="[ ]*$UID"
+		GT_USER_ID_DISP="$UID"
+	fi
+}
+
+## 检查主目录是否存在 MP=Main Path
+gnnt_check_mp()
+{
+	if [ ! -d $GT_MP ]
+	then
+		echo "Not Found Main Path : ${GT_SERVICE_NAME} $GT_OPTION2 "
+		exit 0
+	fi
+}
+
+## 检查设置项
+# 请在 gnnt_check_env() 之后调用
+# [out]: GT_LOGPATH 
+gnnt_check_setting()
+{
+	## 设置log目录，不指定，则自动设置为主目录下的logs目录
+	if [ -z "$GT_LOGPATH" ]
+	then
+		GT_LOGPATH=$GT_MP/logs
+	fi
+
+}
+
+
+## 生成日期时间字符串
+gnnt_date()
+{
+	date +"%y/%m/%d-%H:%M:%S"
+}
+
+## 测试oracle是否正常，0=Y，1=N，如果JAVA_HOME配置不正确，则返回0
+# 参数：如果第一个参数为空，则显示提示信息
+gnnt_testoracle()
+{
+	if [ -z "$GT_ORA_CONN" ]
+	then 
+		[ -z "$1" ] && echo "GT_ORA_CONN not set , Skip test oracle connection..."
+		return 0
+	fi
+	
+	ret=0
+	tipInfo=""
+	
+	if [ -z "$JAVA_HOME" ]
+	then 
+		tipInfo="ERROR：NOT found JAVA_HOME, Skip test oracle connection... "
+		ret=0
+	else
+		rr=`$JAVA_HOME/bin/java -classpath $HOME/bin:$JAVA_HOME/lib:$HOME/bin/10g-ojdbc14.jar GnntOracleTest $GT_ORA_CONN`
+		if [ "$rr" = "succeed" ]
+		then
+			tipInfo="Oralce Test @ `gnnt_date`  --  OK"
+			ret=0
+		else
+			tipInfo="Oralce Test @ `gnnt_date`  --  Fail!!!"
+			ret=1
+		fi
+	fi
+	
+	if [ -z "$1" ]
+	then
+		echo $tipInfo
+	fi
+	
+	return $ret
+}
+
+gnnt_help()
+{
+	echo "> version: $GT_VERSION"
+	echo "> start    启动服务"
+	echo "> stop     停止服务"
+	echo "> restart  重启服务"
+	echo "> status   查看服务的进程状态"
+	echo "> all      查看所有用户启动的该服务的进程状态"  
+	echo "> help     查看帮助信息"
+	echo "> ?        查看帮助信息"
+}
+
+gnnt_usage()
+{
+	echo "Usage: $GT_PRONAME 管理${GT_SERVICE_NAME}的运行状态"
+	echo "  $GT_PRONAME [start|stop|restart|status|all|help|?]"
+	if [ "$1" = "helpinfo" ] 
+	then 
+		gnnt_help
+	fi
+	exit 0;
+}
+
+## 启动程序，自动检查启动脚本的名称，
+gnnt_start()
+{
+	if [ "$GT_OPTION" = "startnolog" ]
+	then
+		if [ -e ./run.sh ]
+		then
+			chmod 744 run.sh
+			./run.sh > /dev/null &
+		elif [ -e ./run ]
+		then
+			chmod 744 run
+			./run > /dev/null &
+		elif [ -e ./start.sh ]
+		then	
+			chmod 744 start.sh
+			./start.sh > /dev/null &
+		elif [ -e ./start ] 
+		then
+			chmod 744 start
+			./start > /dev/null &
+		elif [ -e ./bin/startup.sh ]
+		then
+			cd ./bin
+			chmod 744 *.sh
+			nohup ./startup.sh > /dev/null &
+		elif [ -e ./bin/activemq ]
+		then
+			cd ./bin
+			chmod 744 *
+			nohup ./activemq start > /dev/null &
+		fi
+		
+		## 沉睡3秒，杀掉当前用户所有回滚的tail
+		sleep 3
+		if [ "$GT_SYSTYPE" = "LINUX" ]
+		then
+			kill -9 $(echo `ps ufx | grep '\\_ tail' | grep -v grep | grep "^${GT_USER_ID}" | cut -c${GT_COL_NUM}`) > /dev/null 2>&1
+		else
+			kill -9 $(echo `ps $GT_PS_OPTION | grep "\ tail" | grep -v grep | grep "^${GT_USER_ID}" | cut -c${GT_COL_NUM}`) > /dev/null 2>&1
+		fi
+	else
+		if [ -e ./run.sh ]
+		then
+			chmod 744 run.sh
+			./run.sh
+		elif [ -e ./run ]
+		then
+			chmod 744 run
+			./run
+		elif [ -e ./start.sh ]
+		then	
+			chmod 744 start.sh
+			./start.sh
+			tail -f $GT_TAIL_OPTION ./logs/sys.log
+		elif [ -e ./start ] 
+		then
+			chmod 744 start
+			./start
+		elif [ -e ./bin/startup.sh ]
+		then
+			cd ./bin
+			touch ../logs/catalina.out
+			chmod 744 *.sh
+			nohup ./startup.sh > /dev/null
+			tail -f $GT_TAIL_OPTION ../logs/catalina.out
+		elif [ -e ./bin/activemq ]
+		then
+			cd ./bin
+			chmod 744 *
+			nohup ./activemq start > /dev/null &
+		fi
+	fi
+
+}
+
+gnnt_stop()
+{
+	kill -9 $(echo `ps $GT_PS_OPTION | grep "^${GT_USER_ID}" | grep "$GT_KEY_WORD" | grep -v $GT_PROPID | grep -v '/logs/catalina.out' | grep -v grep | cut -c${GT_COL_NUM}`) > /dev/null 2>&1
+}
+
+gnnt_status()
+{
+	ps $GT_PS_OPTION | grep "^${GT_USER_ID}" | grep "$GT_KEY_WORD" | grep -v $GT_PROPID | grep -v '/logs/catalina.out' | grep -v grep
+}
+
+gnnt_all_status()
+{
+	ps $GT_PS_OPTION | grep "$GT_KEY_WORD" | grep -v $GT_PROPID | grep -v '/logs/catalina.out' | grep -v grep
+}
+
+## 检查是否正在启动，脚本是否正在执行，0=Y，1=N
+gnnt_check_startting()
+{
+	_TEMPNAME="TMP${GT_PROPID}_${RANDOM}"
+	ps $GT_PS_OPTION | grep "${GT_PROPATHNAME}\ ${GT_OPTION}\ ${GT_OPTION2}"|grep -v "$GT_PROPID" |grep -v ^$ | grep -v grep|tr -d ' ' |wc -l >$_TEMPNAME
+	ret=$(cat $_TEMPNAME)
+	rm -rf $_TEMPNAME
+	if [ "$ret" = "0" ]
+	then
+		return 1
+	else
+		return 0
+	fi
+}
+
+## 检查是否已经运行，0=Y，1=N
+gnnt_check_running()
+{
+	ret=`gnnt_status | wc -l | tr -d ' '`
+	if [ "$ret" = "0" ]
+	then
+		return 1
+	else
+		return 0
+	fi	
+}
+
+## 进程存在就真的运行正常吗,0=Y,1=N
+gnnt_is_running_normally()
+{
+	if gnnt_testoracle
+	then
+		return 0
+	else
+		return 1
+	fi	
+}
+
+## 安全启动，启动前检查各种状态
+gnnt_start_s()
+{
+	#检查脚本是否正在执行
+	if gnnt_check_startting
+	then
+		echo "Service is startting up..."
+	else
+		if gnnt_check_running
+		then
+			echo "Service is running..." 
+			if ! gnnt_is_running_normally
+			then
+				echo "Serivce is not running normally , restart now "
+				gnnt_stop
+				sleep 3
+				gnnt_start_s
+			fi
+		else
+			BOOL_RUNNING="FALSE"
+			while ! gnnt_testoracle
+			do	
+				sleep 3
+				if gnnt_check_running
+				then
+					BOOL_RUNNING="TRUE"
+					break;
+				fi
+			done
+			
+			if [ "$BOOL_RUNNING" = "FALSE" ]
+			then			
+				echo "Service is beginning startup"
+				gnnt_start
+			else
+				echo "Service is running , but not me !"
+				if ! gnnt_is_running_normally
+				then
+					echo "Serivce is not running normally , restart now "
+					gnnt_stop
+					sleep 3
+					gnnt_start_s
+				fi
+			fi
+			
+		fi
+	fi
+	
+}
+
+## 计算日志文件大小
+gnnt_logsize()
+{
+	if [ -z "$1" ]
+	then
+		if [ -z "$GT_LOGPATH" ]
+		then
+			GT_LOGPATH=$GT_MP/logs
+		fi
+		#使用用户指定的GT_LOGPATH文件
+	else
+		GT_LOGPATH=$1
+	fi
+	SIZE_LINE="`du -sm $GT_LOGPATH`"
+	SIZE=`echo ${SIZE_LINE%%/*} | tr -d ' '`
+	SIZE_LEN=${#SIZE}
+
+	if [ $SIZE_LEN -eq 4 ] 
+	then 
+		SIZE="** $SIZE"
+	elif [ $SIZE_LEN -eq 3 ] 
+	then
+		SIZE=" *  $SIZE"
+	elif [ $SIZE_LEN -eq 2 ] 
+	then
+		SIZE="     $SIZE"
+	elif [ $SIZE_LEN -eq 1 ] 
+	then
+		SIZE="      $SIZE"
+	else
+		SIZE_LINE="`du -sh $GT_LOGPATH`"
+		SIZE="**** `echo ${SIZE_LINE%%/*} | tr -d ' '`"
+		echo "$SIZE  $GT_LOGPATH"
+		return 
+	fi 
+	echo "$SIZE MB  $GT_LOGPATH"
+}
+
+## 主函数
+#
+gnnt_main()
+{
+	if [ "$GT_OPTION" = "logsize" ]
+	then
+		gnnt_logsize
+		exit 0
+	fi
+	
+	if [ "$GT_OPTION" = "getmainpath" ]
+	then
+		echo "GT_MP=$GT_MP"
+		exit 0
+	fi
+	
+	if [ "$GT_OPTION" = "getlogpath" ]
+	then
+		echo "GT_LOGPATH=$GT_LOGPATH"
+		exit 0
+	fi
+
+	## 切换到程序主目录
+	cd $GT_MP
+
+	if [ "$GT_OPTION" = "help" -o "$GT_OPTION" = "--help" -o "$GT_OPTION" = "-?" -o "$GT_OPTION" = "?" ]
+	then 
+		gnnt_usage helpinfo
+	elif [ "$GT_OPTION" = "" -o "$GT_OPTION" = "s" -o "$GT_OPTION" = "t" ]
+	then
+		GT_OPTION='status'
+		gnnt_status
+		gnnt_testoracle
+	elif [ "$GT_OPTION" = "status" ] 
+	then
+		gnnt_status 
+	elif [ "$GT_OPTION" = "all" ]
+	then
+		gnnt_all_status
+	elif [ "$GT_OPTION" = "stop" ]
+	then
+		gnnt_stop
+	elif [ "$GT_OPTION" = "restart" ]
+	then
+		gnnt_stop
+		sleep 2
+		GT_OPTION="start"
+		gnnt_start_s
+	elif [ "$GT_OPTION" = "start" -o "$GT_OPTION" = "startnolog" ]
+	then
+		gnnt_start_s
+	else
+		gnnt_usage
+	fi
+	
+	## 返回到当前目录
+	cd $CURRENT_PATH
+	echo " - - - - - - $GT_PRONAME $GT_OPTION $GT_OPTION2 finish!!  - - - - - - "
+}
+
+

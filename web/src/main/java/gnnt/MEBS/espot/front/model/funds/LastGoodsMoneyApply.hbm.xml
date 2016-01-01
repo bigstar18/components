@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.funds.LastGoodsMoneyApply" table="x_lastGoodsMoneyapply" dynamic-insert="true" dynamic-update="true">
+		<id name="id"/>
+		<property name="tradeNO"/>
+		<property name="status"/>
+		<property name="createTime"/>
+		<property name="processTime"/>
+	</class>
+</hibernate-mapping>

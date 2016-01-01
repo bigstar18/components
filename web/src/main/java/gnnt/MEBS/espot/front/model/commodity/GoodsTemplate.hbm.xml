@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.commodity.GoodsTemplate" table="E_GoodsTemplate" lazy="true" dynamic-update="true" dynamic-insert="true">
+		<id name="templateID" type="java.lang.Long">
+			<column name="templateID" precision="15" scale="0" />
+			<generator class="native">
+				<param name="sequence">SEQ_E_GOODSTEMPLATE</param>
+			</generator>
+		</id>
+		<property name="orderTitle"/>
+		<property name="categoryID"/>
+		<property name="bsFlag"/>
+		<property name="price"/>
+		<property name="quantity"/>
+		<property name="unit"/>
+		<property name="tradePreTime"/>
+		<property name="tradeMargin_b"/>
+		<property name="tradeMargin_s"/>
+		<property name="deliveryDayType"/>
+		<property name="deliveryPreTime"/>
+		<property name="deliveryDay"/>
+		<property name="deliveryMargin_b"/>
+		<property name="deliveryMargin_s"/>
+		<property name="deliveryType"/>
+		<property name="warehouseID"/>
+		<property name="deliveryAddress"/>
+		<property name="remark"/>
+		<property name="validTime"/>
+		<property name="minTradeQty"/>
+		<property name="tradeUnit"/>
+		<property name="isPickOff"/>
+		<property name="isSuborder"/>
+		<property name="belongTOUser"/>
+		<property name="tradeType"/>
+		<property name="payType"/>
+		<property name="templateType"/>
+<!--		<many-to-one name="belongtoMFirm" column="firmID" lazy="false" class="gnnt.realMardridFront.model.MFirm"/>-->
+		<many-to-one name="breed" column="breedID" lazy="false" class="gnnt.MEBS.espot.front.model.commodity.Breed"/>
+		<set name="containGoodsTemplateProperty" inverse="true" cascade="all" order-by="propertyName asc,propertyValue asc">
+			<key column="templateID"/>
+			<one-to-many class="gnnt.MEBS.espot.front.model.commodity.GoodsTemplateProperty"/>
+		</set>
+	</class>
+</hibernate-mapping>

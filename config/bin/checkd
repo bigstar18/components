@@ -1,0 +1,164 @@
+#!/bin/sh
+###############################
+#
+# 服务检查精灵 - 执行批处理
+# GT_VERSION="1.0"
+#
+###############################
+GT_VERSION="1.0"
+GT_PROPATHNAME=$0
+GT_PRONAME=${GT_PROPATHNAME##*/}
+
+if [ -e $HOME/bin/checkd.debug ]
+then 
+  DEBUG_FLAG=0
+fi
+
+## 检查的监听端口列表，当该端口不通时，测试失败
+MY_LPORT=$1
+
+function gnnt_usage()
+{
+  echo "功能: 服务检查精灵 - 执行批处理"
+  echo "  当检查的端口转为成功时执行checkd_restart，转为失败时执行checkd_stop"
+  echo "Usage: version=$GT_VERSION"
+  echo "  $GT_PRONAME <check_ip>:<check_port>,<oracle|port> <check_ip>:<check_port>,<oracle|port> ..."
+  echo "e.g."
+  echo "  $GT_PRONAME \"127.0.0.1:1521:gnnt,oracle 127.0.0.1:1521,port\"" 
+  echo "  $GT_PRONAME 127.0.0.1:1521,port"
+  exit 0;
+}
+
+# 检查参数
+[ -z "$MY_LPORT" ] && gnnt_usage
+
+function gnnt_date()
+{
+  date +"%y/%m/%d-%H:%M:%S"
+}
+
+g_tipInfo=""
+
+
+function gnnt_testport()
+{
+  if [ -z "$1" ]
+  then
+    return 0
+  fi
+
+  ret=0
+
+  if [ -z "$JAVA_HOME" ]
+  then
+    g_tipInfo="ERROR：NOT found JAVA_HOME "
+    ret=0
+  else
+    $JAVA_HOME/bin/java -classpath $HOME/bin: GnntPortTest $1
+    rr=$?
+    if [ "$rr" = "0" ]
+    then
+      g_tipInfo="Port Test $1 @ `gnnt_date`  --  OK"
+      ret=0
+    else
+      g_tipInfo="Port Test $1 @ `gnnt_date`  --  Fail!!!"
+      ret=1
+    fi
+  fi
+  [ "$DEBUG_FLAG" = "0" ] && echo $g_tipInfo
+  return $ret
+}
+
+## 测试oracle是否正常，0=Y，1=N，如果JAVA_HOME配置不正确，则返回0
+# 参数：如果第一个参数为空，则显示提示信息
+gnnt_testoracle()
+{
+  if [ -z "$1" ]
+  then 
+    return 0
+  fi
+  
+  ret=0
+  
+  if [ -z "$JAVA_HOME" ]
+  then 
+    g_tipInfo="ERROR：NOT found JAVA_HOME "
+    ret=0
+  else
+    rr=`$JAVA_HOME/bin/java -classpath $HOME/bin:$JAVA_HOME/lib:$HOME/bin/10g-ojdbc14.jar GnntOracleTest $1`
+    if [ "$rr" = "succeed" ]
+    then
+      g_tipInfo="Oralce Test $1 @ `gnnt_date`  --  OK"
+      ret=0
+    else
+      g_tipInfo="Oralce Test $1 @ `gnnt_date`  --  Fail!!!"
+      ret=1
+    fi
+  fi
+  
+  [ "$DEBUG_FLAG" = "0" ] && echo $g_tipInfo
+  
+  return $ret
+}
+
+function gnnt_test()
+{
+  ret=1
+  for portline in $MY_LPORT
+  do
+    TMP_PORT=`echo $portline | cut -d ',' -f 1`
+	TMP_TYPE=`echo $portline | cut -d ',' -f 2`
+    if [ "$TMP_TYPE" = "oracle" ]
+    then
+      gnnt_testoracle $TMP_PORT
+      ret=$?
+    else
+      gnnt_testport $TMP_PORT
+      ret=$?
+    fi
+    [ $ret -eq 1 ] && return $ret
+  done
+  return $ret
+}
+
+function restartcmd()
+{
+  echo " * checkd_restart @ `gnnt_date` * "
+  chmod a+x $HOME/bin/checkd_restart
+  $HOME/bin/checkd_restart
+}
+
+function stopcmd()
+{
+  echo " * checkd_stop @ `gnnt_date` * "
+  chmod a+x $HOME/bin/checkd_stop
+  $HOME/bin/checkd_stop
+}
+
+function test()
+{
+  gnnt_test
+  STATUS_CUR=$?
+  
+  if [ $STATUS_LAST -eq 0 -a $STATUS_CUR -eq 1 ]
+  then
+    stopcmd
+  elif [ $STATUS_LAST -eq 1 -a $STATUS_CUR -eq 0 ]
+  then
+    #监听刚刚恢复
+    restartcmd
+  fi
+  STATUS_LAST=$STATUS_CUR
+  sleep 3
+}
+
+## main ##
+
+gnnt_test
+STATUS_CUR=$?
+STATUS_LAST=$STATUS_CUR
+
+while true
+do
+  test
+done

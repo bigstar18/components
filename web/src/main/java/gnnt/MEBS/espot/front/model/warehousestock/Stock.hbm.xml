@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.warehousestock.Stock" table="BI_Stock" dynamic-insert="true" dynamic-update="true">
+		<id name="stockID"/>
+		<property name="realStockCode"/>
+		<property name="warehouseID"/>
+		<property name="quantity"/>
+		<property name="unit"/>
+		<property name="lastTime"/>
+		<property name="createTime"/>
+		<property name="status">
+			<column name="StockStatus"/>
+		</property>
+		<property name="dismantleCount" formula="(select count(*) from BI_Dismantle d where d.stockID=stockID and d.Status!='2')"/>
+		<many-to-one name="belongtoBreed" column="breedID" class="gnnt.MEBS.espot.front.model.commodity.Breed"/>
+		<many-to-one name="belongtoFirm" column="ownerFirm" class="gnnt.MEBS.common.front.model.integrated.MFirm"/>
+		<set name="containProperty" cascade="none" lazy="false" fetch="join">
+			<key column="stockID"/>
+			<one-to-many class="gnnt.MEBS.espot.front.model.warehousestock.WareHouseGoodsProperty"/>
+		</set>
+		<set name="containOperation" cascade="none" lazy="false" fetch="join">
+			<key column="stockID"/>
+			<one-to-many class="gnnt.MEBS.espot.front.model.warehousestock.StockOperation"/>
+		</set>
+	</class>
+</hibernate-mapping>

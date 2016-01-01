@@ -1,0 +1,331 @@
+#!/bin/sh
+:
+
+GT_VERSION=1.3.0
+
+###自动配置参数##########################################
+##传入参数
+FLAG_CONN_C=`echo "$@" | grep -c -- '-c' | tr -d ' '`
+FLAG_CONN_A=`echo "$@" | grep -c -- '-a' | tr -d ' '`
+FLAG_CONN_CA=`echo "$@" | grep -c -- '-ca' | tr -d ' '`
+
+## 如果有参数-l，设置标志为非0
+FLAG_LOGSIZE=`echo "$@" | grep -c -- '-l' | tr -d ' '`
+
+#### 加载GNNT函数库和配置项
+[ -e $HOME/bin/gnnt_profile ] && . $HOME/bin/gnnt_profile
+[ -e $HOME/bin/gnnt_lib ] && . $HOME/bin/gnnt_lib
+
+#### 检查环境
+gnnt_check_env
+
+
+
+
+###函数集##########################################
+t_help()
+{
+	echo "-- help of tt --"
+	echo "显示各服务的状态，Y表示进程数量正常，N表示没有，数字表示进程个数"
+	echo "-l         查看日志大小"
+	echo "-c/-a/-ca  查看网络连接数,c 建立的连接数, a 所有与端口相关的socket状态计数"
+	echo "           关于每个服务的端口信息，在gnnt_profile里的<^H>GT_PORT_<^H>开头的变量设置"
+	echo "start/stop 控制所有服务"
+}
+
+##列名称
+t_h_conn()
+{
+	if [ ! "$FLAG_CONN_CA" = "0" ] 
+	then 
+		echo "-conn(ca)--"
+	elif [ ! "$FLAG_CONN_A" = "0" ]
+	then
+		echo "--conn(a)--"
+	elif [ ! "$FLAG_CONN_C" = "0" ]
+	then
+		echo "--conn(c)--"
+	else
+		echo ""
+	fi
+}
+
+##检查指定端口的连接数
+t_conn()
+{
+	disptext=""
+	dispflag=0
+	if [ "$1" = "0" ] 
+	then
+		if [ $FLAG_CONN_C -gt 0 -o $FLAG_CONN_A -gt 0 -o $FLAG_CONN_CA -gt 0 ] 
+		then
+			disptext="-"
+		else
+			dispflag=1
+		fi
+	else
+		if [ $FLAG_CONN_CA -gt 0 ] 
+		then 
+			disptext=`netstat -na | grep "ESTABLISHED" | grep "$1" | wc -l`/`netstat -na | grep "$1" | wc -l`			
+		elif [ $FLAG_CONN_A -gt 0 ]
+		then
+			disptext=`netstat -na | grep "$1" | wc -l`
+		elif [ $FLAG_CONN_C -gt 0 ]
+		then
+			disptext=`netstat -na | grep "ESTABLISHED" | grep "$1" | wc -l`
+		else
+			dispflag=1
+		fi
+	fi
+	if [ $dispflag -eq 0 ]
+	then
+		disptext=`echo "$disptext                            " | cut -c1-11 `
+		echo "$disptext"
+	else
+		echo ""
+	fi
+}
+
+t_h_logsize()
+{
+	[ $FLAG_LOGSIZE -gt 0 ] && echo "--LogSize--"
+}
+
+## 根据参数1的设置执行命令
+t_logsize()
+{
+	if [ $FLAG_LOGSIZE -gt 0 ] 
+	then 
+		"$@"
+	else
+		echo ""
+	fi	
+}
+
+##检查指定服务
+# 参数1：执行的结果
+# 参数2：服务进程数量
+t_status()
+{
+	ret="$1"
+	if [ "$ret" = "$2" ]
+	then 
+		echo " Y        "  
+	elif [ "$ret" = "0" ]
+	then
+		echo "        N "
+	else
+		echo "     $ret    "
+	fi
+}
+
+# $1, 命令名
+# $2, 附加参数，通常为空" " 
+# $3, 进程数量，一般为1
+# $4, 连接端口号，0表示没有
+t_checkservice()
+{
+	TMP_TIP="$1  $2                                   "
+	TMP_TIP=`echo "$TMP_TIP" | cut -c1-20 `
+	TMP_BIN=$HOME/bin/$1
+	if [ -x ${TMP_BIN} ] 
+	then
+		TMP_RET=`${TMP_BIN} getmainpath $2 | grep 'GT_MP=' | wc -l | tr -d ' '`
+		if [ "$TMP_RET" = "1" ]
+		then
+			echo "${TMP_TIP}  $(t_status `${TMP_BIN} status $2 | grep "^${GT_USER_ID}" | wc -l` $3 )  $(t_conn $4)  $(t_logsize ${TMP_BIN} logsize $2)"
+		fi
+	fi
+}
+
+t_checkd_status()
+{
+count=`ps -ef | grep checkd | grep -vc grep`
+if [ $count -eq 1 ]
+then
+	echo "checkd   Y"
+elif [ $count -eq 0 ]
+then
+	echo "checkd   N *** "
+else
+	echo "checkd   $count ??"
+fi
+}
+
+###文件引用名###########################################
+GT_FILE_MQ="mq_gnnt"
+GT_FILE_COMMON_CORE="core_common_gnnt"
+GT_FILE_BILL_CORE="core_bill_gnnt"
+GT_FILE_ESPOT_CORE="core_espot_gnnt"
+GT_FILE_FINANCING_CORE="core_financing_gnnt"
+GT_FILE_TIMEBARGAIN_CORE="core_timebargain_gnnt"
+GT_FILE_CONDITIONPLUGIN_CORE="core_conditionPlugin_gnnt"
+GT_FILE_INTERFACE_CORE="core_interface_gnnt"
+
+GT_FILE_HQSERVICE_CORE="core_hqs_gnnt"
+GT_FILE_HQTRANS_CORE="core_hqt_gnnt"
+GT_FILE_QUOTATION_CORE="core_quotation_gnnt"
+
+GT_FILE_ISSUEHQSERVICE_CORE="core_issuehqs_gnnt"
+GT_FILE_ISSUEHQTRANS_CORE="core_issuehqt_gnnt"
+GT_FILE_ISSUEQUOTATION_CORE="core_issuequotation_gnnt"
+
+GT_FILE_VENDUE_CORE="core_vendue_gnnt"
+
+GT_FILE_ISSUE_CORE="core_issue_gnnt"
+GT_FILE_ISSUE_SUBSCRIBE_CORE="core_issue_subscribe_gnnt"
+GT_FILE_ISSUE_BILL_CORE="core_issue_bill_gnnt"
+
+GT_FILE_MGRGETFRONTUSERS_CORE="core_mgrgetfrontusers_gnnt"
+
+GR_FILE_AU_MGR="au_mgr_gnnt"
+GR_FILE_AU_BROKER="au_broker_gnnt"
+GR_FILE_AU_WAREHOUSE="au_warehouse_gnnt"
+GR_FILE_AU_INTEGRATED="au_integrated_gnnt"
+GR_FILE_AU_FINANCE="au_finance_gnnt"
+GR_FILE_AU_BILL="au_bill_gnnt"
+GR_FILE_AU_FINANCING="au_financing_gnnt"
+GR_FILE_AU_ESPOT="au_espot_gnnt"
+GR_FILE_AU_BANK="au_bank_gnnt"
+GR_FILE_AU_COMMON="au_common_gnnt"
+
+GT_FILE_MGR="tc_mgr_gnnt"
+GT_FILE_FRONT="tc_front_gnnt"
+GT_FILE_BANK_CORE="tc_bank_core_gnnt"
+GT_FILE_TRADEWEB="tc_tradeweb_gnnt"
+GT_FILE_BROKER="tc_broker_gnnt"
+GT_FILE_WAREHOUSE="tc_warehouse_gnnt"
+GT_FILE_ISSUETRADEWEB="tc_issuetradeweb_gnnt"
+
+
+
+
+##检查所有服务
+t_checkall()
+{
+echo " - - Check all service status - - "
+echo "--service--           --status--  $(t_h_conn) $(t_h_logsize)"
+t_checkservice $GT_FILE_MQ " " 1 $GT_PORT_MQ
+
+t_checkservice $GT_FILE_COMMON_CORE " " 1 $GT_PORT_COMMON_CORE
+t_checkservice $GT_FILE_BILL_CORE " " 1 $GT_PORT_BILL_CORE
+t_checkservice $GT_FILE_ESPOT_CORE " " 1 $GT_PORT_ESPOT_CORE
+t_checkservice $GT_FILE_FINANCING_CORE " " 1 $GT_PORT_FINANCING_CORE
+t_checkservice $GT_FILE_TIMEBARGAIN_CORE " " 1 $GT_PORT_TIMEBARGAIN_CORE
+t_checkservice $GT_FILE_CONDITIONPLUGIN_CORE " " 1 $GT_PORT_CONDITIONPLUGIN_CORE
+t_checkservice $GT_FILE_INTERFACE_CORE " " 1 $GT_PORT_INTERFACE_CORE
+
+t_checkservice $GT_FILE_HQSERVICE_CORE " " 1 $GT_PORT_HQSERVICE_CORE
+t_checkservice $GT_FILE_HQTRANS_CORE " " 1 $GT_PORT_HQTRANS_CORE
+t_checkservice $GT_FILE_QUOTATION_CORE " " 1 $GT_PORT_QUOTATION_CORE
+
+t_checkservice $GT_FILE_ISSUEHQSERVICE_CORE " " 1 $GT_PORT_ISSUEHQSERVICE_CORE
+t_checkservice $GT_FILE_ISSUEHQTRANS_CORE " " 1 $GT_PORT_ISSUEHQTRANS_CORE
+t_checkservice $GT_FILE_ISSUEQUOTATION_CORE " " 1 $GT_PORT_ISSUQUOTATION_CORE
+
+t_checkservice $GT_FILE_VENDUE_CORE " " 1 $GT_PORT_VENDUE_CORE
+
+t_checkservice $GT_FILE_ISSUE_CORE " " 1 $GT_PORT_ISSUE_CORE
+t_checkservice $GT_FILE_ISSUE_SUBSCRIBE_CORE " " 1 $GT_PORT_ISSUE_SUBSCRIBE_CORE
+t_checkservice $GT_FILE_ISSUE_BILL_CORE " " 1 $GT_PORT_ISSUE_BILL_CORE
+
+t_checkservice $GT_FILE_MGRGETFRONTUSERS_CORE " " 1 $GT_PORT_MGRGETFRONTUSERS_CORE
+
+t_checkservice $GR_FILE_AU_MGR " " 1 $GT_PORT_AU_MGR
+t_checkservice $GR_FILE_AU_BROKER " " 1 $GT_PORT_AU_BROKER
+t_checkservice $GR_FILE_AU_WAREHOUSE " " 1 $GT_PORT_AU_WAREHOUSE
+t_checkservice $GR_FILE_AU_INTEGRATED " " 1 $GT_PORT_AU_INTEGRATED
+t_checkservice $GR_FILE_AU_FINANCE " " 1 $GT_PORT_AU_FINANCE
+t_checkservice $GR_FILE_AU_BILL " " 1 $GT_PORT_AU_BILL
+t_checkservice $GR_FILE_AU_FINANCING " " 1 $GT_PORT_AU_FINANCING
+t_checkservice $GR_FILE_AU_ESPOT " " 1 $GT_PORT_AU_ESPOT
+t_checkservice $GR_FILE_AU_BANK " " 1 $GT_PORT_AU_BANK
+t_checkservice $GR_FILE_AU_COMMON " " 1 $GT_PORT_AU_COMMON
+
+t_checkservice $GT_FILE_MGR " " 1 $GT_PORT_MGR
+t_checkservice $GT_FILE_FRONT " " 1 $GT_PORT_FRONT
+t_checkservice $GT_FILE_BANK_CORE " " 1 $GT_PORT_BANK_CORE
+t_checkservice $GT_FILE_TRADEWEB " " 1 $GT_PORT_TRADEWEB
+t_checkservice $GT_FILE_BROKER " " 1 $GT_PORT_BROKER
+t_checkservice $GT_FILE_WAREHOUSE " " 1 $GT_PORT_WAREHOUSE
+t_checkservice $GT_FILE_ISSUETRADEWEB " " 1 $GT_PORT_ISSUETRADEWEB
+
+echo " - - checkd status - - - - - - - - "
+t_checkd_status
+echo " - - ORACLE status - - - - - - - - "
+gnnt_testoracle
+echo " - - Check all service finish - - "
+}
+
+##控制所有服务
+#参数1：控制命令
+t_controlall()
+{
+[ -x "$HOME/bin/$GT_FILE_MQ" ]       && `$HOME/bin/$GT_FILE_MQ $1 > /dev/null & `
+
+[ -x "$HOME/bin/$GT_FILE_COMMON_CORE" ]       && `$HOME/bin/$GT_FILE_COMMON_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_BILL_CORE" ]       && `$HOME/bin/$GT_FILE_BILL_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_ESPOT_CORE" ]       && `$HOME/bin/$GT_FILE_ESPOT_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_FINANCING_CORE" ]       && `$HOME/bin/$GT_FILE_FINANCING_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_TIMEBARGAIN_CORE" ]       && `$HOME/bin/$GT_FILE_TIMEBARGAIN_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_CONDITIONPLUGIN_CORE" ]       && `$HOME/bin/$GT_FILE_CONDITIONPLUGIN_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_INTERFACE_CORE" ]       && `$HOME/bin/$GT_FILE_INTERFACE_CORE $1 > /dev/null & `
+
+[ -x "$HOME/bin/$GT_FILE_HQSERVICE_CORE" ]       && `$HOME/bin/$GT_FILE_HQSERVICE_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_HQTRANS_CORE" ]       && `$HOME/bin/$GT_FILE_HQTRANS_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_QUOTATION_CORE" ]       && `$HOME/bin/$GT_FILE_QUOTATION_CORE $1 > /dev/null & `
+
+[ -x "$HOME/bin/$GT_FILE_ISSUEHQSERVICE_CORE" ]       && `$HOME/bin/$GT_FILE_ISSUEHQSERVICE_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_ISSUEHQTRANS_CORE" ]       && `$HOME/bin/$GT_FILE_ISSUEHQTRANS_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_ISSUEQUOTATION_CORE" ]       && `$HOME/bin/$GT_FILE_ISSUEQUOTATION_CORE $1 > /dev/null & `
+
+[ -x "$HOME/bin/$GT_FILE_VENDUE_CORE" ]       && `$HOME/bin/$GT_FILE_VENDUE_CORE $1 > /dev/null & `
+
+[ -x "$HOME/bin/$GT_FILE_ISSUE_CORE" ]       && `$HOME/bin/$GT_FILE_ISSUE_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_ISSUE_SUBSCRIBE_CORE" ]       && `$HOME/bin/$GT_FILE_ISSUE_SUBSCRIBE_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_ISSUE_BILL_CORE" ]       && `$HOME/bin/$GT_FILE_ISSUE_BILL_CORE $1 > /dev/null & `
+
+[ -x "$HOME/bin/$GT_FILE_MGRGETFRONTUSERS_CORE" ]       && `$HOME/bin/$GT_FILE_MGRGETFRONTUSERS_CORE $1 > /dev/null & `
+
+[ -x "$HOME/bin/$GR_FILE_AU_MGR" ]       && `$HOME/bin/$GR_FILE_AU_MGR $1 > /dev/null & `
+[ -x "$HOME/bin/$GR_FILE_AU_BROKER" ]       && `$HOME/bin/$GR_FILE_AU_BROKER $1 > /dev/null & `
+[ -x "$HOME/bin/$GR_FILE_AU_WAREHOUSE" ]       && `$HOME/bin/$GR_FILE_AU_WAREHOUSE $1 > /dev/null & `
+[ -x "$HOME/bin/$GR_FILE_AU_INTEGRATED" ]       && `$HOME/bin/$GR_FILE_AU_INTEGRATED $1 > /dev/null & `
+[ -x "$HOME/bin/$GR_FILE_AU_FINANCE" ]       && `$HOME/bin/$GR_FILE_AU_FINANCE $1 > /dev/null & `
+[ -x "$HOME/bin/$GR_FILE_AU_BILL" ]       && `$HOME/bin/$GR_FILE_AU_BILL $1 > /dev/null & `
+[ -x "$HOME/bin/$GR_FILE_AU_FINANCING" ]       && `$HOME/bin/$GR_FILE_AU_FINANCING $1 > /dev/null & `
+[ -x "$HOME/bin/$GR_FILE_AU_ESPOT" ]       && `$HOME/bin/$GR_FILE_AU_ESPOT $1 > /dev/null & `
+[ -x "$HOME/bin/$GR_FILE_AU_BANK" ]       && `$HOME/bin/$GR_FILE_AU_BANK $1 > /dev/null & `
+[ -x "$HOME/bin/$GR_FILE_AU_COMMON" ]       && `$HOME/bin/$GR_FILE_AU_COMMON $1 > /dev/null & `
+
+[ -x "$HOME/bin/$GT_FILE_FRONT" ]               && `$HOME/bin/$GT_FILE_FRONT $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_MGR" ]               && `$HOME/bin/$GT_FILE_MGR $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_BANK_CORE" ]               && `$HOME/bin/$GT_FILE_BANK_CORE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_TRADEWEB" ]               && `$HOME/bin/$GT_FILE_TRADEWEB $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_BROKER" ]              && `$HOME/bin/$GT_FILE_BROKER $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_WAREHOUSE" ]              && `$HOME/bin/$GT_FILE_WAREHOUSE $1 > /dev/null & `
+[ -x "$HOME/bin/$GT_FILE_ISSUETRADEWEB" ]               && `$HOME/bin/$GT_FILE_ISSUETRADEWEB $1 > /dev/null & `
+
+sleep 3
+echo ""
+}
+
+#### main ###################################
+
+OPTION="$1"
+if [ "$OPTION" = "" -o $FLAG_CONN_C -gt 0 -o $FLAG_CONN_A -gt 0 -o $FLAG_CONN_CA -gt 0 -o $FLAG_LOGSIZE -gt 0 ]
+then 
+	t_checkall
+elif [ "$OPTION" = "start" -o "$OPTION" = "stop" ]
+then
+	if [ "$OPTION" = "start" ]
+	then
+		t_controlall "${OPTION}nolog"
+	else
+		t_controlall "${OPTION}"
+	fi
+else
+	echo "Parameter name is not correct!!"
+	t_help
+fi
+

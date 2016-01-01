@@ -1,0 +1,34 @@
+checkd.txt
+==包含文件=======================================================
+checkd        
+核心程序，用来检测指定的服务状态，并根据状态变化，执行checkd_restart和checkd_stop脚本
+checkd_restart在这里配置restart时要执行的命令
+checkd_stop   在这里配置stop时要执行的命令
+checkd_sh     启动预先设置好参数的checkd
+
+==checkd  ========================================================
+checkd (check demon) 服务检查精灵, 用来检测指定服务端口的状态，当状态发生转变时，执行预设的操作。
+
+当服务端口状态由false转变为true时，执行checkd_restart脚本，当由true变为false，执行checkd_stop脚本。
+
+
+checkd 的参数只有一个，请用双引号括起来，这是一个测试端口列表，每个记录用空格隔开，当所有记录都状态都可用时，
+检查结果才算true，否则为false。
+
+每条记录由连接字符串(connect string)和端口类型(port type)两部分组成，用逗号隔开，端口类型(port type)分为oracle端口(oracle)和一般端口(port),
+
+Usage:
+  checkd "<connect string>,<port type> <connect string>,<port type> ..."
+
+当端口类型为oracle时，连接字符串为 <host>:<port>:<oracle sid> 格式
+当端口类型为一般顿卡，连接字符串为 <host>:<port>
+
+举例：
+  checkd "172.16.10.125:1521:gnnt,oracle 172.16.10.125:16917,port"
+  说明：当172.16.10.125:1521:gnnt的oracle服务和172.16.10.125:16917的状态都正常
+  
+==checkd_sh========================================================
+将checkd的调用命令写在这个文件里，举例
+
+nohup checkd "172.16.10.125:1521:gnnt,oracle" > $HOME/bin/checkd.log &
+

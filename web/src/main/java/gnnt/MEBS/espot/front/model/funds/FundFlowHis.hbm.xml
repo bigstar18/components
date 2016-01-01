@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.funds.FundFlowHis" table="F_H_FundFlow" dynamic-insert="true" dynamic-update="true">
+		<id name="fundFlowID"/>
+		<property name="oprCode"/>
+		<property name="contractNo"/>
+		<property name="commodityID"/>
+		<property name="amount"/>
+		<property name="balance"/>
+		<property name="appendAmount"/>
+		<property name="voucherNo"/>
+		<property name="createTime"/>
+		<property name="bdate">
+			<column name="B_Date"/>
+		</property>
+		<many-to-one name="belongtoFirm" column="firmID" class="gnnt.MEBS.common.front.model.integrated.MFirm"/>
+		<many-to-one name="belongtoSummary" column="oprCode" class="gnnt.MEBS.espot.front.model.Summary" insert="false" update="false"/>
+	</class>
+</hibernate-mapping>

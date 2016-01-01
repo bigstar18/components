@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.funds.Funds" table="E_Funds" dynamic-insert="true" dynamic-update="true">
+		<id name="firmID"/>
+		<property name="margin"/>
+		<property name="goodsMoney"/>
+		<property name="transferLoss"/>
+		<property name="subscription"/>
+		<many-to-one name="belongtoFirm" class="gnnt.MEBS.common.front.model.integrated.MFirm" column="firmID" insert="false" update="false"/>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.commodity.Category" table="M_Category" dynamic-insert="true" dynamic-update="true">
+		<id name="categoryID"/>
+		<property name="categoryName"/>
+		<property name="note"/>
+		<property name="type"/>
+		<property name="sortNo"/>
+		<property name="status"/>
+		<property name="isOffset"/>
+		<property name="offsetRate"/>
+		<property name="belongModule" />
+		<many-to-one name="parentCategory" column="parentCategoryID"  lazy="false" class="gnnt.MEBS.espot.front.model.commodity.Category"/>
+		<set name="childCategory" cascade="none" lazy="false"  order-by="sortNo,categoryID">
+			<key column="parentCategoryID" />
+			<one-to-many class="gnnt.MEBS.espot.front.model.commodity.Category"/>
+		</set>
+		<set name="containBreed" cascade="none" lazy="false" order-by="categoryID,sortNo"  where="belongModule like '%23%'" >
+			<key column="categoryID" />
+			<one-to-many class="gnnt.MEBS.espot.front.model.commodity.Breed"/>
+		</set>
+		<set name="containProperty" cascade="none" lazy="false" order-by="sortNo,categoryID">
+			<key column="categoryID" />
+			<one-to-many class="gnnt.MEBS.espot.front.model.commodity.Property"/>
+		</set>
+	</class>
+</hibernate-mapping>

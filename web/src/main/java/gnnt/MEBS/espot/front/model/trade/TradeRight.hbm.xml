@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.trade.TradeRight" table="E_TradeRight" lazy="true" dynamic-insert="true" dynamic-update="true">
+		<id name="tradeRightID" type="java.lang.Long">
+			<column name="tradeRightID" precision="10" scale="0" />
+			<!-- <generator class="native">
+				<param name="sequence"></param>
+			</generator> -->
+		</id>
+		<property name="firmID" />
+		<property name="buyOrder" type="java.lang.Integer"/>
+		<property name="sellOrder" type="java.lang.Integer"/>
+		<property name="buyPick" type="java.lang.Integer"/>
+		<property name="sellPick" type="java.lang.Integer"/>
+		<property name="isPickoff" type="java.lang.Integer"/>
+	</class>
+</hibernate-mapping>

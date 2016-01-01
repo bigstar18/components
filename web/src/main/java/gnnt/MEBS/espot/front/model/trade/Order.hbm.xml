@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.trade.Order" table="E_Order">
+		<id name="orderID"/>
+		<property name="categoryID"/>
+		<property name="orderTitle"/>
+		<property name="bsFlag"/>
+		<property name="price"/>
+		<property name="quantity"/>
+		<property name="unit"/>
+		<property name="tradePreTime"/>
+		<property name="tradeMargin_B"/>
+		<property name="tradeMargin_S"/>
+		<property name="deliveryDayType"/>
+		<property name="deliveryPreTime"/>
+		<property name="deliveryDay"/>
+		<property name="deliveryMargin_B"/>
+		<property name="deliveryMargin_S"/>
+		<property name="deliveryType"/>
+		<property name="warehouseID"/>
+		<property name="deliveryAddress"/>
+		<property name="status"/>
+		<property name="tradedQty"/>
+		<property name="remark"/>
+		<property name="orderTime"/>
+		<property name="effectOfTime"/>
+		<property name="traderID"/>
+		<property name="withdrawTime"/>
+		<property name="withdrawTraderID"/>
+		<property name="validTime"/>
+		<property name="pledgeFlag"/>
+		<property name="minTradeQty"/>
+		<property name="tradeUnit"/>
+		<property name="isPickOff"/>
+		<property name="isSuborder"/>
+		<property name="isPayMargin"/>
+		<property name="frozenMargin"/>
+		<property name="tradeType"/>
+		<property name="payType"/>
+		<property name="stockID"/>
+		<many-to-one name="belongtoMFirm" column="firmID" lazy="false" class="gnnt.MEBS.common.front.model.integrated.MFirm"/>
+		<many-to-one name="belongtoBreed" column="breedID" lazy="false" class="gnnt.MEBS.espot.front.model.commodity.Breed"/>
+		<set name="containGoodsProperty" cascade="none" lazy="false" fetch="join" order-by="propertyName asc,propertyValue asc">
+			<key column="orderID" />
+			<one-to-many class="gnnt.MEBS.espot.front.model.trade.GoodsProperty"/>
+		</set>
+		<set name="containSubOrder" cascade="none" order-by="subFirmID,status">
+			<key column="orderID" />
+			<one-to-many class="gnnt.MEBS.espot.front.model.trade.SubOrder"/>
+		</set>
+	</class>
+</hibernate-mapping>

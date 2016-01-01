@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.trade.BreachApply" table="E_BreachApply" dynamic-insert="true" dynamic-update="true">
+		<id name="breachApplyId">
+			<generator class="native">
+				<param name="sequence">SEQ_E_BREACHAPPLY</param>
+			</generator>
+		</id>
+		<property name="tradeNo"  insert="false" update="false"/>
+		<property name="applyTime" />
+		<property name="processTime" />
+		<property name="status" />
+		<property name="delayTime" />
+		<many-to-one name="firm" column="firmId" class="gnnt.MEBS.common.front.model.integrated.MFirm"/>
+		<many-to-one name="trade" column="tradeNo" class="gnnt.MEBS.espot.front.model.trade.Trade" update="false" index="false"></many-to-one>
+	</class>
+</hibernate-mapping>

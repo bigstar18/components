@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.commodity.GoodsTemplateProperty" table="E_GoodsTemplateProperty" lazy="true" dynamic-insert="true" dynamic-update="true">
+		<composite-id>
+			<key-property name="propertyName" type="java.lang.String">
+				<column name="propertyName" length="64" />
+			</key-property>
+			<key-many-to-one name="template" column="templateID" class="gnnt.MEBS.espot.front.model.commodity.GoodsTemplate"></key-many-to-one>
+		</composite-id>
+		<property name="propertyValue"/>
+		<property name="propertyTypeID"/>
+	</class>
+</hibernate-mapping>

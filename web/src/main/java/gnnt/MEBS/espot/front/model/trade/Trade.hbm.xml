@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.trade.Trade" table="E_Trade" dynamic-insert="true" dynamic-update="true">
+		<id name="tradeNo"/>
+		<property name="orderTitle"/>
+		<property name="bfirmID"/>
+		<property name="sfirmID"/>
+		<property name="price"/>
+		<property name="quantity"/>
+		<property name="unit"/>
+		<property name="tradePreTime"/>
+		<property name="tradeMargin_B"/>
+		<property name="tradeMargin_S"/>
+		<property name="deliveryDay" type="java.util.Date"/>
+		<property name="deliveryMargin_B"/>
+		<property name="deliveryMargin_S"/>
+		<property name="deliveryType"/>
+		<property name="warehouseID"/>
+		<property name="deliveryAddress"/>
+		<property name="time"  type="java.util.Date"/>
+		<property name="remark"/>
+		<property name="status"/>
+		<property name="orderID"/>
+		<property name="buyTradeFee"/>
+		<property name="buyPayTradeFee"/>
+		<property name="buyDeliveryFee"/>
+		<property name="buyPayDeliveryFee"/>
+		<property name="sellTradeFee"/>
+		<property name="sellPayTradeFee"/>
+		<property name="sellDeliveryFee"/>
+		<property name="sellPayDeliveryFee"/>
+		<property name="tradeType"/>
+		<property name="payType"/>
+		<many-to-one name="belongtoBreed" column="breedID" class="gnnt.MEBS.espot.front.model.commodity.Breed"/>
+		<set name="tradeGoodsPropertys" cascade="none" lazy="false" fetch="join">
+			<key column="TradeNo"></key>
+			<one-to-many class="gnnt.MEBS.espot.front.model.trade.TradeGoodsProperty"/>
+		</set>
+		<set name="containReserve" cascade="none" lazy="false" fetch="join">
+			<key column="tradeNO" />
+			<one-to-many class="gnnt.MEBS.espot.front.model.trade.Reserve" />
+		</set>
+		<set name="containHolding" cascade="none" lazy="false" fetch="join">
+			<key column="tradeNO" />
+			<one-to-many class="gnnt.MEBS.espot.front.model.trade.Holding" />
+		</set>
+	</class>
+</hibernate-mapping>

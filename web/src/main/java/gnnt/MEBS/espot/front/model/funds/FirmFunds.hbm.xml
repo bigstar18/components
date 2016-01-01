@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.funds.FirmFunds" table="F_FirmFunds" dynamic-insert="true" dynamic-update="true">
+		<id name="firmID"/>
+		<property name="balance"/>
+		<property name="frozenFunds"/>
+		<property name="lastBalance"/>
+		<property name="lastWarranty"/>
+		<property name="settleMargin"/>
+		<property name="lastSettleMargin"/>
+		<many-to-one name="belongtoFirm" column="firmID" class="gnnt.MEBS.common.front.model.integrated.MFirm" insert="false" update="false"/>
+	</class>
+</hibernate-mapping>

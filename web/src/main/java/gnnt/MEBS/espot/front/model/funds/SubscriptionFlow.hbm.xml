@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.funds.SubscriptionFlow" table="E_SUBSCRIPTIONFLOW" dynamic-insert="true" dynamic-update="true">
+		<id name="flowID"/>
+		<property name="oprcode"/>
+		<property name="amount"/>
+		<property name="balance"/>
+		<property name="createTime"/>
+		<many-to-one name="belongtoFirm" class="gnnt.MEBS.common.front.model.integrated.MFirm" column="firmID"/>
+	</class>
+</hibernate-mapping>

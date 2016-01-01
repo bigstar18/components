@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.warehousestock.TradeStock" table="BI_TradeStock" dynamic-insert="true" dynamic-update="true">
+		<id name="tradeStockID"/>
+		<property name="createTime"/>
+		<property name="releaseTime"/>
+		<property name="status"/>
+		<property name="moduleID"/>
+		<property name="tradeNo" type="string"/>
+		<many-to-one name="belongtoStock" column="stockID" class="gnnt.MEBS.espot.front.model.warehousestock.Stock"/>
+		<many-to-one name="belongtoTrade" column="tradeNo" class="gnnt.MEBS.espot.front.model.trade.Trade"  insert="false" update="false"/>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,1897 @@
+----------------------------------------------
+-- Export file for user TRADE_GNNT@XHDBDEMO --
+-- Created by hxx on 2015/11/8, 0:01:02 ------
+----------------------------------------------
+
+set define off
+spool vendue.all.struct.log
+
+prompt
+prompt Creating table V_BARGAIN
+prompt ========================
+prompt
+create table V_BARGAIN
+(
+  contractid     NUMBER(10) not null,
+  tradepartition NUMBER(3) default 1 not null,
+  section        NUMBER(5) not null,
+  submitid       NUMBER(12) not null,
+  code           VARCHAR2(64) not null,
+  commodityid    VARCHAR2(64) not null,
+  price          NUMBER(12,2) not null,
+  amount         NUMBER(16,6) not null,
+  userid         VARCHAR2(32) not null,
+  tradetime      DATE default trunc(sysdate),
+  b_bail         NUMBER(12,2) default 0 not null,
+  s_bail         NUMBER(12,2) default 0 not null,
+  b_poundage     NUMBER(12,2) default 0 not null,
+  s_poundage     NUMBER(12,2) default 0 not null
+)
+;
+alter table V_BARGAIN
+  add constraint PK_V_BARGAIN primary key (CONTRACTID);
+
+prompt
+prompt Creating table V_COMMEXT
+prompt ========================
+prompt
+create table V_COMMEXT
+(
+  id          NUMBER(10) not null,
+  code        VARCHAR2(64) not null,
+  attributeid NUMBER(10) not null,
+  attribute   VARCHAR2(64) not null,
+  value       VARCHAR2(128) not null
+)
+;
+alter table V_COMMEXT
+  add constraint PK_V_COMMEXT primary key (ID);
+
+prompt
+prompt Creating table V_COMMODITY
+prompt ==========================
+prompt
+create table V_COMMODITY
+(
+  code               VARCHAR2(64) not null,
+  tradepartition     NUMBER(3) default 1 not null,
+  firsttime          DATE not null,
+  commodityid        VARCHAR2(128) not null,
+  createtime         DATE not null,
+  status             NUMBER(3) default 2 not null,
+  breedid            NUMBER(10) not null,
+  splitid            VARCHAR2(512) default 0 not null,
+  userid             VARCHAR2(32) not null,
+  amount             NUMBER(16,6) not null,
+  tradeunit          NUMBER(16,6) default 0.000001 not null,
+  minamount          NUMBER(16,6) not null,
+  maxamount          NUMBER(16,6) not null,
+  flowamountalgr     NUMBER(2) default 0 not null,
+  flowamount         NUMBER(16,6) default 0.000001 not null,
+  beginprice         NUMBER(15,2) not null,
+  alertprice         NUMBER(15,2) default -1,
+  stepprice          NUMBER(15,2) not null,
+  maxstepprice       NUMBER(15,2) not null,
+  marginalgr         NUMBER(2) not null,
+  b_security         NUMBER(15,4) not null,
+  s_security         NUMBER(15,4) not null,
+  feealgr            NUMBER(2) not null,
+  b_fee              NUMBER(15,5) not null,
+  s_fee              NUMBER(15,5) not null,
+  authorization      NUMBER(2) default 0 not null,
+  isorder            NUMBER(2) default 0 not null,
+  bs_flag            NUMBER(2),
+  tendertradeconfirm NUMBER(2) default 0 not null,
+  auditstatus        NUMBER(2) default 0 not null,
+  audituser          VARCHAR2(128),
+  audittime          DATE,
+  remark             VARCHAR2(256)
+)
+;
+alter table V_COMMODITY
+  add constraint PK_V_COMMODITY primary key (CODE);
+
+prompt
+prompt Creating table V_COMMODITYPARAMS
+prompt ================================
+prompt
+create table V_COMMODITYPARAMS
+(
+  tradepartition NUMBER(3) default 1 not null,
+  breedid        NUMBER(10) not null,
+  tradeunit      NUMBER(16,6) not null,
+  minamount      NUMBER(16,6) not null,
+  maxamount      NUMBER(16,6) not null,
+  stepprice      NUMBER(15,2) not null,
+  maxstepprice   NUMBER(15,2) not null,
+  marginalgr     NUMBER(2) not null,
+  b_security     NUMBER(15,4) not null,
+  s_security     NUMBER(15,4) not null,
+  feealgr        NUMBER(2) not null,
+  b_fee          NUMBER(15,5) not null,
+  s_fee          NUMBER(15,5) not null,
+  flowamountalgr NUMBER(2) default 0 not null,
+  flowamount     NUMBER(16,6) default 0.000001 not null
+)
+;
+alter table V_COMMODITYPARAMS
+  add constraint PK_V_TRADEMODULEPARAMS primary key (TRADEPARTITION, BREEDID);
+
+prompt
+prompt Creating table V_COMMODITYSELF
+prompt ==============================
+prompt
+create table V_COMMODITYSELF
+(
+  partitionid NUMBER(3) not null,
+  usercode    VARCHAR2(32) not null,
+  code        VARCHAR2(64) not null,
+  time        DATE not null
+)
+;
+alter table V_COMMODITYSELF
+  add constraint PK_V_COMMODITYSELF primary key (PARTITIONID, USERCODE, CODE);
+
+prompt
+prompt Creating table V_CONTRACTTEMPLET
+prompt ================================
+prompt
+create table V_CONTRACTTEMPLET
+(
+  id      NUMBER(5) not null,
+  breedid NUMBER(10) not null,
+  name    VARCHAR2(128),
+  templet CLOB not null
+)
+;
+alter table V_CONTRACTTEMPLET
+  add constraint PK_V_CONTRACTTEMPLET primary key (ID);
+
+prompt
+prompt Creating table V_CURCOMMODITY
+prompt =============================
+prompt
+create table V_CURCOMMODITY
+(
+  code           VARCHAR2(64) not null,
+  tradepartition NUMBER(3) default 1 not null,
+  commodityid    VARCHAR2(128) not null,
+  section        NUMBER(3),
+  bargaintype    NUMBER(2) default 0 not null,
+  modifytime     DATE not null
+)
+;
+alter table V_CURCOMMODITY
+  add constraint PK_V_CURCOMMODITY primary key (CODE);
+
+prompt
+prompt Creating table V_CURSUBMIT
+prompt ==========================
+prompt
+create table V_CURSUBMIT
+(
+  id             NUMBER(12) not null,
+  tradepartition NUMBER(3) default 1 not null,
+  code           VARCHAR2(64) not null,
+  price          NUMBER(12,2) default 0 not null,
+  amount         NUMBER(16,6) default 0 not null,
+  traderid       VARCHAR2(40) not null,
+  userid         VARCHAR2(32) not null,
+  submittime     DATE not null,
+  ordertype      NUMBER(3) not null,
+  validamount    NUMBER(16,6) default 0 not null,
+  modifytime     TIMESTAMP(6) default systimestamp(6),
+  frozenmargin   NUMBER(15,2) default 0 not null,
+  frozenfee      NUMBER(15,2) default 0 not null,
+  unfrozenmargin NUMBER(15,2) default 0 not null,
+  unfrozenfee    NUMBER(15,2) default 0 not null,
+  withdrawtype   NUMBER(2)
+)
+;
+alter table V_CURSUBMIT
+  add constraint PK_V_CURSUBMIT primary key (ID);
+
+prompt
+prompt Creating table V_CURSUBMITTENDER
+prompt ================================
+prompt
+create table V_CURSUBMITTENDER
+(
+  id             NUMBER(12) not null,
+  tradepartition NUMBER(3) default 1 not null,
+  code           VARCHAR2(64) not null,
+  price          NUMBER(12,2) default 0 not null,
+  amount         NUMBER(16,6) default 0 not null,
+  traderid       VARCHAR2(40) not null,
+  userid         VARCHAR2(32) not null,
+  submittime     DATE not null,
+  ordertype      NUMBER(3) not null,
+  validamount    NUMBER(16,6) default 0 not null,
+  modifytime     TIMESTAMP(6) default systimestamp(6),
+  frozenmargin   NUMBER(15,2) default 0 not null,
+  frozenfee      NUMBER(15,2) default 0 not null,
+  unfrozenmargin NUMBER(15,2) default 0 not null,
+  unfrozenfee    NUMBER(15,2) default 0 not null,
+  withdrawtype   NUMBER(2)
+)
+;
+alter table V_CURSUBMITTENDER
+  add constraint PK_V_CURSUBMITTENDER primary key (ID);
+
+prompt
+prompt Creating table V_CURSUBMITTENDERPLAN
+prompt ====================================
+prompt
+create table V_CURSUBMITTENDERPLAN
+(
+  id             NUMBER(12) not null,
+  tradepartition NUMBER(3) default 1 not null,
+  code           VARCHAR2(64) not null,
+  price          NUMBER(12,2) default 0 not null,
+  amount         NUMBER(16,6) default 0 not null,
+  confirmamount  NUMBER(16,6) default 0 not null,
+  traderid       VARCHAR2(40) not null,
+  userid         VARCHAR2(32) not null,
+  submittime     DATE not null,
+  ordertype      NUMBER(3) not null,
+  validamount    NUMBER(16,6) default 0 not null,
+  modifytime     TIMESTAMP(6) default systimestamp(6),
+  frozenmargin   NUMBER(15,2) default 0 not null,
+  frozenfee      NUMBER(15,2) default 0 not null,
+  unfrozenmargin NUMBER(15,2) default 0 not null,
+  unfrozenfee    NUMBER(15,2) default 0 not null,
+  withdrawtype   NUMBER(2)
+)
+;
+alter table V_CURSUBMITTENDERPLAN
+  add constraint PK_V_CURSUBMITTENDERPLAN primary key (ID);
+
+prompt
+prompt Creating table V_FIRMSPECIALFEE
+prompt ===============================
+prompt
+create table V_FIRMSPECIALFEE
+(
+  usercode   VARCHAR2(32) not null,
+  breedid    NUMBER(10) not null,
+  bs_flag    NUMBER(2) not null,
+  feealgr    NUMBER(2) not null,
+  fee        NUMBER(15,5) default 0 not null,
+  updatetime TIMESTAMP(6)
+)
+;
+alter table V_FIRMSPECIALFEE
+  add constraint PK_V_FIRMSPECIALFEE primary key (USERCODE, BREEDID, BS_FLAG);
+
+prompt
+prompt Creating table V_FIRMSPECIALMARGIN
+prompt ==================================
+prompt
+create table V_FIRMSPECIALMARGIN
+(
+  usercode   VARCHAR2(32) not null,
+  breedid    NUMBER(10) not null,
+  bs_flag    NUMBER(2) not null,
+  marginalgr NUMBER(2) not null,
+  margin     NUMBER(15,4) default 0 not null,
+  updatetime TIMESTAMP(6)
+)
+;
+alter table V_FIRMSPECIALMARGIN
+  add constraint PK_V_FIRMSPECIALMARGIN primary key (USERCODE, BREEDID, BS_FLAG);
+
+prompt
+prompt Creating table V_FLOWCONTROL
+prompt ============================
+prompt
+create table V_FLOWCONTROL
+(
+  tradepartition NUMBER(3) default 1 not null,
+  unittype       NUMBER(2) not null,
+  unitid         NUMBER(5) not null,
+  breedid        NUMBER(10) not null,
+  startmode      NUMBER(2) not null,
+  starttime      VARCHAR2(32),
+  durativetime   NUMBER(8) not null,
+  countdownstart VARCHAR2(128),
+  countdowntime  VARCHAR2(128),
+  quartertime    NUMBER(8) default 0 not null,
+  forcedendtime  VARCHAR2(32),
+  ismargincount  NUMBER(2) default 0 not null
+)
+;
+alter table V_FLOWCONTROL
+  add constraint PK_V_FLOWCONTROL primary key (TRADEPARTITION, UNITTYPE, UNITID);
+
+prompt
+prompt Creating table V_FUNDFROZEN
+prompt ===========================
+prompt
+create table V_FUNDFROZEN
+(
+  id           NUMBER(10) not null,
+  userid       VARCHAR2(32) not null,
+  code         VARCHAR2(64) not null,
+  frozenmargin NUMBER(15,2) default 0 not null,
+  frozenfee    NUMBER(15,2) default 0 not null,
+  frozentime   TIMESTAMP(6) not null
+)
+;
+alter table V_FUNDFROZEN
+  add constraint PK_V_FUNDFROZEN primary key (ID);
+
+prompt
+prompt Creating table V_HISBARGAIN
+prompt ===========================
+prompt
+create table V_HISBARGAIN
+(
+  tradedate      DATE not null,
+  contractid     NUMBER(10) not null,
+  tradepartition NUMBER(3) default 1 not null,
+  section        NUMBER(5) not null,
+  submitid       NUMBER(12) not null,
+  code           VARCHAR2(64) not null,
+  commodityid    VARCHAR2(64) not null,
+  price          NUMBER(12,2) not null,
+  amount         NUMBER(16,6) not null,
+  userid         VARCHAR2(32) not null,
+  tradetime      DATE default trunc(sysdate),
+  b_bail         NUMBER(12,2) default 0 not null,
+  b_unfrozenbail NUMBER(12,2) default 0 not null,
+  s_bail         NUMBER(12,2) default 0 not null,
+  s_unfrozenbail NUMBER(12,2) default 0 not null,
+  b_poundage     NUMBER(12,2) default 0 not null,
+  s_poundage     NUMBER(12,2) default 0 not null,
+  status         NUMBER(3) default -1,
+  result         NUMBER(2) default 0,
+  b_payments     NUMBER(15,2) default 0 not null,
+  s_payments     NUMBER(15,2) default 0 not null,
+  b_referpayment NUMBER(15,2) default 0 not null,
+  s_referpayment NUMBER(15,2) default 0 not null,
+  b_dedit        NUMBER(15,2) default 0 not null,
+  s_dedit        NUMBER(15,2) default 0 not null,
+  processingtime TIMESTAMP(6),
+  remark         VARCHAR2(500)
+)
+;
+alter table V_HISBARGAIN
+  add constraint PK_V_HISBARGAIN primary key (TRADEDATE, CONTRACTID);
+
+prompt
+prompt Creating table V_HISCOMMODITY
+prompt =============================
+prompt
+create table V_HISCOMMODITY
+(
+  tradedate      DATE not null,
+  code           VARCHAR2(64) not null,
+  tradepartition NUMBER(3) default 1 not null,
+  commodityid    VARCHAR2(128) not null,
+  section        NUMBER(5),
+  bargaintype    NUMBER(2) default 0 not null,
+  modifytime     DATE not null
+)
+;
+alter table V_HISCOMMODITY
+  add constraint PK_V_HISCOMMODITY primary key (TRADEDATE, CODE);
+
+prompt
+prompt Creating table V_HISSUBMIT
+prompt ==========================
+prompt
+create table V_HISSUBMIT
+(
+  tradedate      DATE not null,
+  id             NUMBER(12) not null,
+  tradepartition NUMBER(3) default 1 not null,
+  code           VARCHAR2(64) not null,
+  price          NUMBER(12,2) default 0 not null,
+  amount         NUMBER(16,6) default 0 not null,
+  userid         VARCHAR2(32) not null,
+  traderid       VARCHAR2(40) not null,
+  submittime     DATE not null,
+  ordertype      NUMBER(3) not null,
+  validamount    NUMBER(16,6) default 0,
+  modifytime     TIMESTAMP(0) default systimestamp(6),
+  frozenmargin   NUMBER(15,2) default 0 not null,
+  frozenfee      NUMBER(15,2) default 0 not null,
+  unfrozenmargin NUMBER(15,2) default 0 not null,
+  unfrozenfee    NUMBER(15,2) default 0 not null,
+  withdrawtype   NUMBER(2)
+)
+;
+alter table V_HISSUBMIT
+  add constraint PK_V_HISSUBMIT primary key (TRADEDATE, ID);
+
+prompt
+prompt Creating table V_HISTRADEAUTHORITY
+prompt ==================================
+prompt
+create table V_HISTRADEAUTHORITY
+(
+  tradedate DATE not null,
+  code      VARCHAR2(64) not null,
+  usercode  VARCHAR2(32) not null,
+  modiftime DATE not null
+)
+;
+alter table V_HISTRADEAUTHORITY
+  add constraint PK_V_HISTRADEAUTHORITY primary key (TRADEDATE, CODE, USERCODE);
+
+prompt
+prompt Creating table V_HISTRADEUSER
+prompt =============================
+prompt
+create table V_HISTRADEUSER
+(
+  tradedate       DATE not null,
+  usercode        VARCHAR2(32) not null,
+  overdraft       NUMBER(10,2) default 0 not null,
+  isentry         NUMBER(2) default 0 not null,
+  tradecount      NUMBER(8) default 0 not null,
+  limits          NUMBER(2) default 3 not null,
+  iscontinueorder NUMBER(2) default 0 not null,
+  modifytime      DATE default sysdate
+)
+;
+alter table V_HISTRADEUSER
+  add constraint PK_V_HISTRADEUSER primary key (TRADEDATE, USERCODE);
+
+prompt
+prompt Creating table V_SECTIONATTRIBUTE
+prompt =================================
+prompt
+create table V_SECTIONATTRIBUTE
+(
+  id            NUMBER(10) not null,
+  partitionid   NUMBER(3) not null,
+  unitid        NUMBER(5) not null,
+  breedid       NUMBER(10) not null,
+  attributeid   NUMBER(10),
+  attributename VARCHAR2(128),
+  num           NUMBER(10),
+  updatetime    TIMESTAMP(6)
+)
+;
+alter table V_SECTIONATTRIBUTE
+  add constraint PK_V_SECTIONATTRIBUTE primary key (ID);
+
+prompt
+prompt Creating table V_SYSCURSTATUS
+prompt =============================
+prompt
+create table V_SYSCURSTATUS
+(
+  tradepartition NUMBER(3) default 1 not null,
+  status         NUMBER(3) not null,
+  section        NUMBER(8) not null,
+  modifytime     DATE not null,
+  starttime      DATE,
+  endtime        DATE,
+  isclose        NUMBER(2) default 0 not null
+)
+;
+alter table V_SYSCURSTATUS
+  add constraint PK_V_SYSCURSTATUS primary key (TRADEPARTITION);
+
+prompt
+prompt Creating table V_SYSLOG
+prompt =======================
+prompt
+create table V_SYSLOG
+(
+  id         NUMBER(15) not null,
+  userid     VARCHAR2(16) not null,
+  action     NUMBER(2),
+  createtime DATE,
+  note       VARCHAR2(2000)
+)
+;
+alter table V_SYSLOG
+  add constraint PK_V_SYSLOG primary key (ID);
+
+prompt
+prompt Creating table V_SYSPARTITION
+prompt =============================
+prompt
+create table V_SYSPARTITION
+(
+  partitionid           NUMBER(3) not null,
+  firmlimitclass        VARCHAR2(256) not null,
+  validetcommodityclass VARCHAR2(256) not null,
+  traderuleclass        VARCHAR2(256) not null,
+  bargainactionclass    VARCHAR2(256) not null,
+  kernelengineclass     VARCHAR2(256) not null,
+  countdownclass        VARCHAR2(256) not null,
+  validflag             NUMBER(3) not null,
+  description           VARCHAR2(128),
+  trademode             NUMBER(3) not null,
+  selfrate              NUMBER(10) default 0 not null,
+  isshowquotation       NUMBER(2) default 0,
+  maxshowqty            NUMBER(5) default 3 not null,
+  countmode             NUMBER(2) default 0 not null,
+  ismargincount         NUMBER(2) default 0 not null,
+  issplittarget         NUMBER(2) default 0 not null,
+  isshowprice           NUMBER(2) default 0 not null
+)
+;
+alter table V_SYSPARTITION
+  add constraint PK_V_SYSPARTITION primary key (PARTITIONID);
+
+prompt
+prompt Creating table V_SYSPROPERTY
+prompt ============================
+prompt
+create table V_SYSPROPERTY
+(
+  tradepartition NUMBER(3) default 1 not null,
+  durativetime   NUMBER(8) not null,
+  spacetime      NUMBER(6) not null,
+  countdownstart VARCHAR2(128) not null,
+  countdowntime  VARCHAR2(128) not null,
+  breedid        NUMBER(10)
+)
+;
+alter table V_SYSPROPERTY
+  add constraint PK_V_SYSPROPERTY primary key (TRADEPARTITION);
+
+prompt
+prompt Creating table V_TEMPLETCLASSSET
+prompt ================================
+prompt
+create table V_TEMPLETCLASSSET
+(
+  id    NUMBER(10) not null,
+  class VARCHAR2(256) not null,
+  type  NUMBER(2) not null,
+  name  VARCHAR2(256) not null
+)
+;
+alter table V_TEMPLETCLASSSET
+  add constraint PK117 primary key (ID);
+
+prompt
+prompt Creating table V_TRADEAUTHORITY
+prompt ===============================
+prompt
+create table V_TRADEAUTHORITY
+(
+  code      VARCHAR2(64) not null,
+  usercode  VARCHAR2(32) not null,
+  modiftime DATE not null
+)
+;
+alter table V_TRADEAUTHORITY
+  add constraint PK_V_TRADEAUTHORITY primary key (CODE, USERCODE);
+
+prompt
+prompt Creating table V_TRADEMODEPARAMS
+prompt ================================
+prompt
+create table V_TRADEMODEPARAMS
+(
+  id   NUMBER(10) not null,
+  name VARCHAR2(32) not null
+)
+;
+alter table V_TRADEMODEPARAMS
+  add constraint PK_V_TRADEMODEPARAMS primary key (ID);
+
+prompt
+prompt Creating table V_TRADEUSER
+prompt ==========================
+prompt
+create table V_TRADEUSER
+(
+  usercode        VARCHAR2(32) not null,
+  overdraft       NUMBER(10,2) default 0 not null,
+  isentry         NUMBER(2) default 0 not null,
+  tradecount      NUMBER(8) default 0 not null,
+  limits          NUMBER(2) default 3 not null,
+  iscontinueorder NUMBER(2) default 0 not null,
+  modifytime      DATE default sysdate
+)
+;
+alter table V_TRADEUSER
+  add constraint PK_V_TRADEUSER primary key (USERCODE);
+
+prompt
+prompt Creating sequence SEQ_V_COMMEXT
+prompt ===============================
+prompt
+create sequence SEQ_V_COMMEXT
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 121
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SEQ_V_FUNDFROZEN
+prompt ==================================
+prompt
+create sequence SEQ_V_FUNDFROZEN
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 101
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SEQ_V_SECTIONATTRIBUTE
+prompt ========================================
+prompt
+create sequence SEQ_V_SECTIONATTRIBUTE
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 101
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SP_V_BARGAIN
+prompt ==============================
+prompt
+create sequence SP_V_BARGAIN
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 81
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SP_V_COMMODITY
+prompt ================================
+prompt
+create sequence SP_V_COMMODITY
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 101
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SP_V_COMMODITYTYPE
+prompt ====================================
+prompt
+create sequence SP_V_COMMODITYTYPE
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SP_V_COMMODITY_CODE
+prompt =====================================
+prompt
+create sequence SP_V_COMMODITY_CODE
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SP_V_CURSUBMIT
+prompt ================================
+prompt
+create sequence SP_V_CURSUBMIT
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 81
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SP_V_OUTID
+prompt ============================
+prompt
+create sequence SP_V_OUTID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SP_V_PAYMENTFORSELLER
+prompt =======================================
+prompt
+create sequence SP_V_PAYMENTFORSELLER
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SP_V_SYSLOG
+prompt =============================
+prompt
+create sequence SP_V_SYSLOG
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SP_V_VOUCHERENTRYID
+prompt =====================================
+prompt
+create sequence SP_V_VOUCHERENTRYID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SP_V_VOUCHERNO
+prompt ================================
+prompt
+create sequence SP_V_VOUCHERNO
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20;
+
+prompt
+prompt Creating function FN_V_CLOSEMARKET
+prompt ==================================
+prompt
+create or replace function FN_V_CloseMarket(p_partitionID number) return number
+/****
+ * 2013-08-22 by liuyu
+ * 闭市处理
+****/
+as
+    v_sysdate     date;
+    v_status      number(3);
+
+    --当前商品
+    type cue_curComm is ref cursor;
+    v_curComm cue_curComm;
+    v_tradepartition      number(3);
+    v_code                varchar2(64);
+    v_commodityid         varchar2(64);
+    v_section             number(3);
+    --v_lpflag              number(2);   --是否流拍（0：否；1：是）
+    v_bargainType         number(2);   --是否成交（0：否；1：是）
+    v_modifytime          date;
+    v_F_FrozenFunds       number(15,2):=0;
+begin
+    --获取当前时间
+    select sysdate,status into v_sysdate,v_status from v_syscurstatus where tradepartition = p_partitionID;
+    if(v_status <> 5) then
+        return 0;--系统状态不为闭市直接退出
+    end if;
+
+    --导入历史委托清当前委托
+    insert into v_hissubmit
+          (tradedate, id, tradepartition, code, price, amount, userid, traderId, submittime, OrderType, validamount, modifytime, FrozenMargin, FrozenFee, unFrozenMargin, unFrozenFee, WithdrawType)
+    select v_sysdate, id, tradepartition, code, price, amount, userid, traderID, submittime, OrderType, validamount, modifytime, FrozenMargin, FrozenFee, unFrozenMargin, unFrozenFee, WithdrawType
+      from v_cursubmit
+     where tradePartition = p_partitionID;
+
+    delete from v_cursubmit where tradePartition = p_partitionID;
+
+    --清空当日行情
+    --delete from v_tradequotation where tradePartition = p_partitionID;
+
+    --成交表数据导入历史成交表、合同扩展表、清当前成交表
+    insert into v_hisbargain
+			  (tradeDate, contractID, tradePartition, section, submitID, code, commodityid, price, amount, userid, tradeTime, b_bail, s_bail, b_poundage, s_poundage, b_payments, s_payments, b_referPayment, s_referPayment, b_dedit, s_dedit, processingTime, remark)
+		select sysdate, contractid, tradepartition, section, submitid, code, commodityid, price, amount, userid, tradetime, b_bail, s_bail, b_poundage, s_poundage, 0,          0,          0,              0,              0,       0,       sysdate,        null
+      from v_bargain where tradePartition = p_partitionID;
+
+   /* insert into V_ContractExtra (id, code, firmName, witnessmember)
+      select contractid,commodityid,userid,SEQ_V_WITNESSMEMBER.Nextval from v_bargain where tradePartition = p_partitionID;*/
+
+    delete from v_bargain where tradePartition = p_partitionID;
+
+    --当前商品导历史
+    open v_curComm for select tradepartition, code, commodityid, section, bargainType, modifytime from v_curcommodity where tradePartition = p_partitionID;
+        loop
+            fetch v_curComm into v_tradepartition, v_code, v_commodityid, v_section, v_bargainType, v_modifytime;
+            exit when v_curComm%NOTFOUND;
+                --导入历史商品表
+                insert into v_hiscommodity
+                    (tradedate, tradepartition,   code,   commodityid,   section,   bargainType,   modifytime)
+                values
+                    (v_sysdate, v_tradepartition, v_code, v_commodityid, v_section, v_bargainType, v_modifytime);
+        end loop;
+
+    --清当前商品
+    delete from v_curcommodity where tradePartition = p_partitionID;
+
+    --交易权限表导历史表、清当前表（已成交的商品）
+    insert into v_hisTradeAuthority
+           (tradeDate, Code, userCode, ModifTime)
+      select sysdate, t.code, t.usercode, t.modiftime
+        from v_TradeAuthority t, v_commodity c
+       where t.Code = c.Code
+         and c.status in (1,7);
+
+    delete v_TradeAuthority where Code in (select code from v_commodity where status in (1,7));
+
+    --清空自选商品表
+    delete from V_CommoditySelf where partitionid = p_partitionID;
+
+    --退挂单方冻结资金并删除冻结记录
+    for withdraw in (select f.code,f.userID,f.FrozenMargin,f.FrozenFee from V_FundFrozen f,v_commodity c where f.code = c.code and c.Tradepartition = p_partitionID and c.Status<>1)
+        loop
+            v_F_FrozenFunds := FN_F_UpdateFrozenFunds(withdraw.userID,-withdraw.FrozenMargin-withdraw.FrozenFee,'21');
+            delete V_FundFrozen where Code = withdraw.code;
+        end loop;
+
+    --更新当前系统状态表中闭市处理为已处理
+    update v_sysCurStatus set isClose = 1 where tradePartition = p_partitionID;
+
+    return 1;
+exception
+    when others then
+    rollback;
+    return -1;
+end;
+/
+
+prompt
+prompt Creating function FN_V_COMPUTEFEE
+prompt =================================
+prompt
+create or replace function FN_V_ComputeFee(
+    p_Code           varchar2,
+    p_bs_flag        number,      --买卖标志（1：买；2：卖）
+    p_quantity       number,
+    p_price          number,
+    p_userID         varchar2
+) return number
+/****
+ * 计算手续费（竞价）
+ * 返回值 成功返回手续费;-1 计算交易费用所需数据不全;-100 其它错误
+****/
+as
+    v_feeRate_b         number(15,5);
+    v_feeRate_s         number(15,5);
+    v_feeAlgr           number(2);
+    v_feeRate           number(15,5);
+    v_fee               number(15,2) default 0;
+    --v_commodityID       varchar2(64);
+    v_BreedID           number(10,0);
+    v_num               number(10);
+begin
+    --获取商品信息：交易手续费
+    select FeeAlgr,B_fee,S_fee,BreedID into v_feeAlgr,v_feeRate_b,v_feeRate_s,v_BreedID from v_commodity where Code=p_Code;
+
+    --------------------------特殊手续费------------------------------------
+    --获取特殊手续费
+    select count(*) into v_num from V_FirmSpecialFee where userCode = p_userID and BreedID = v_BreedID and bs_flag = p_bs_flag;
+    if(v_num = 1) then
+        select FeeAlgr,Fee into v_feeAlgr,v_feeRate from V_FirmSpecialFee where userCode = p_userID and BreedID = v_BreedID and bs_flag = p_bs_flag;
+        if(p_bs_flag = 1) then
+            v_feeRate_b := v_feeRate;
+        else
+            v_feeRate_s := v_feeRate;
+        end if;
+    end if;
+    --------------------------特殊手续费 end------------------------------------
+
+    if(v_feeAlgr=1) then  --百分比
+    	if(p_bs_flag = 1) then  --买
+        	v_fee:=p_quantity*p_price*v_feeRate_b;
+        elsif(p_bs_flag = 2) then  --卖
+        	v_fee:=p_quantity*p_price*v_feeRate_s;
+        end if;
+    elsif(v_feeAlgr=0) then  --绝对值
+    	if(p_bs_flag = 1) then  --买
+        	v_fee:=p_quantity*v_feeRate_b;
+        elsif(p_bs_flag = 2) then  --卖
+        	v_fee:=p_quantity*v_feeRate_s;
+        end if;
+    end if;
+    if(v_fee is null) then
+    	  rollback;
+        return -1;
+    end if;
+    return v_fee;
+exception
+    when no_data_found then
+    	rollback;
+        return -1;
+    when others then
+    	rollback;
+   		return -100;
+end;
+/
+
+prompt
+prompt Creating function FN_V_COMPUTEMARGIN
+prompt ====================================
+prompt
+create or replace function FN_V_ComputeMargin(
+    p_Code            varchar2,
+    p_bs_flag         number,   --交易模式（1：买；2：卖）
+    p_quantity        number,
+    p_price           number,
+    p_userID          varchar2
+) return number
+/****
+ * 计算保证金（竞价）
+ * 返回值 成功返回保证金;-1 计算所需数据不全;-100 其它错误
+****/
+as
+	  v_version varchar2(10):='1.0.0.1';
+    v_marginRate_b         number(15,4);
+    v_marginRate_s         number(15,4);
+    v_marginRate           number(15,4);
+    --v_commodityID          varchar2(64);
+    v_marginAlgr           number(2);
+    v_margin               number(12,2) default 0;
+    v_BreedID              number(10,0);
+    v_num                  number(10);
+begin
+    --获取商品信息：交易保证金
+    select MarginAlgr,B_security,S_security,BreedID into v_marginAlgr,v_marginRate_b,v_marginRate_s,v_BreedID from v_commodity where Code=p_Code;
+
+    --------------------------特殊保证金------------------------------------
+    --获取特殊保证金
+    select count(*) into v_num from V_FirmSpecialMargin where userCode = p_userID and BreedID = v_BreedID and bs_flag = p_bs_flag;
+    if(v_num = 1) then
+        select MarginAlgr,Margin into v_marginAlgr,v_marginRate from V_FirmSpecialMargin where userCode = p_userID and BreedID = v_BreedID and bs_flag = p_bs_flag;
+        if(p_bs_flag = 1) then
+            v_marginRate_b := v_marginRate;
+        else
+            v_marginRate_s := v_marginRate;
+        end if;
+    end if;
+    --------------------------特殊保证金 end------------------------------------
+
+    if(v_marginAlgr=1) then  --百分比
+    	if(p_bs_flag = 1) then  --买
+		    if(v_marginRate_b = -1) then --  -1表示收全款
+		    	v_margin:=p_quantity*p_price;
+		    else
+			    v_margin:=p_quantity*p_price*v_marginRate_b;
+		    end if;
+      elsif(p_bs_flag = 2) then  --卖
+		    if(v_marginRate_s = -1) then --  -1表示收全款
+		    	v_margin:=p_quantity*p_price;
+		    else
+			    v_margin:=p_quantity*p_price*v_marginRate_s;
+		    end if;
+      end if;
+    elsif(v_marginAlgr=0) then  --绝对值
+    	if(p_bs_flag = 1) then  --买
+		    if(v_marginRate_b = -1) then --  -1表示收全款
+		    	v_margin:=p_quantity*p_price;
+		    else
+			    v_margin:=p_quantity*v_marginRate_b;
+		    end if;
+      elsif(p_bs_flag = 2) then  --卖
+		    if(v_marginRate_s = -1) then --  -1表示收全款
+		    	v_margin:=p_quantity*p_price;
+		    else
+			    v_margin:=p_quantity*v_marginRate_s;
+		    end if;
+      end if;
+    end if;
+
+    if(v_margin is null) then
+    	rollback;
+      return -1;
+    end if;
+    return v_margin;
+exception
+    when no_data_found then
+    	rollback;
+      return -1;
+    when others then
+	    rollback;
+    	return -100;
+end;
+/
+
+prompt
+prompt Creating function FN_V_FIRMADD
+prompt ==============================
+prompt
+create or replace function FN_V_FirmAdd(p_FirmID varchar2)
+return number
+ /****
+  *增加交易商
+  *成功返回 1
+  *****/
+as
+     v_cnt number(5);
+begin
+     select count(*) into v_cnt from v_tradeuser where usercode=p_firmid;
+     if(v_cnt>0) then
+           return -1; --交易商已存在
+     end if;
+     --插入交易商表，默认有竞价权限、无挂单权限
+     insert into v_tradeuser(usercode,isEntry,limits)
+     values(P_FIRMID,0,0);
+
+     return 1;
+end;
+/
+
+prompt
+prompt Creating function FN_V_FIRMDEL
+prompt ==============================
+prompt
+create or replace function FN_V_FirmDel(p_FirmID varchar2)
+return number
+ /****
+  *注销交易商
+  *成功返回 1
+  *****/
+as
+     v_cnt number(5);
+begin
+    delete from v_tradeuser where usercode=p_FirmID;
+
+    update v_hisbargain set userid=userid||'_D' where userid=p_FirmID;
+    update v_hissubmit set userid=userid||'_D' where userid=p_FirmID;
+
+    return 1;
+end;
+/
+
+prompt
+prompt Creating function FN_V_FIRMEXITCHECK
+prompt ====================================
+prompt
+create or replace function FN_V_FirmExitCheck(p_FirmID varchar2)
+return number
+as
+/**
+ * 竞价 交易商退市
+ **/
+  v_cnt number(4);
+begin
+  select count(*) into v_cnt from v_tradeuser v where v.usercode=p_FirmID;
+  if(v_cnt=0) then
+    return -1;
+  end if;
+  --有合同未处理完
+  select count(*) into v_cnt from v_hisbargain where userid=p_FirmID and status!=2;
+  if(v_cnt!=0) then
+    return -1;
+  end if;
+
+  return 1;
+end;
+/
+
+prompt
+prompt Creating function FN_V_ORDER
+prompt ============================
+prompt
+create or replace function FN_V_Order(
+    p_tradePartition     number,    --交易模块（1：竞买；2：竞卖）
+    p_Code               varchar2,  --标的号
+    p_Price              number,    --价格
+    p_amount             number,    --数量
+    p_traderId           varchar2,  --交易员
+    p_userID             varchar2,  --交易用户(交易商)
+    p_Margin             number,    --保证金
+    p_Fee                number,    --手续费
+    p_orderTime          timestamp  --委托时间
+) return number
+/****
+ * 2012-03-21 by liuyu
+ * 竞价委托
+ * 返回值
+ *	下委托成功返回委托单号
+ *	-1  异常返回
+ *	-2  资金不足返回
+****/
+as
+    v_F_Funds         number(15,2):=0;      --应冻结资金
+    v_A_Funds         number(15,2);         --可用资金
+    v_F_FrozenFunds   number(15,2):=0;      --冻结资金
+    v_A_OrderNo       number(15,0);         --委托号
+    v_orderTime       timestamp;
+    v_Overdraft       number(10,2):=0;      --交易商虚拟资金
+begin
+        -- 获取当前数据库时间
+        select systimestamp(6) into v_orderTime from dual;
+
+        --应冻结资金
+        v_F_Funds := p_Margin + p_Fee;
+        --2013-10-08获取虚拟资金
+        select Overdraft into v_Overdraft from v_tradeUser where userCode = p_userID;
+        --计算可用资金，并锁住财务资金
+        v_A_Funds := FN_F_GetRealFunds(p_userID,1);
+        if(v_A_Funds + v_Overdraft < v_F_Funds) then
+            rollback;
+            return -2;  --资金余额不足
+        end if;
+
+        --更新冻结资金
+        v_F_FrozenFunds := FN_F_UpdateFrozenFunds(p_userID,v_F_Funds,'21');
+        --插入委托表，并返回委托单号
+        select SP_V_CURSUBMIT.nextval into v_A_OrderNo from dual;
+        insert into v_curSubmit
+          (ID,          tradePartition,   Code,   Price,   amount,   traderId,   userID,   submitTime,  OrderType, validAmount, modifytime,  FrozenMargin, FrozenFee, unFrozenMargin, unFrozenFee, WithdrawType)
+        values
+          (v_A_OrderNo, p_tradePartition, p_Code, p_Price, p_amount, p_traderId, p_userID, p_orderTime, 0,         p_amount,    v_orderTime, p_Margin,     p_Fee,     0,              0,           null);
+
+        /*if(p_tradePartition=1) then
+            update v_tradeUser set TradeQty = TradeQty + p_amount where userCode = p_userID;
+        end if;
+
+        if(p_withOrderNo > 0) then
+            update v_curSubmit set modifytime = v_orderTime,ToItsType = 2 where ID = p_withOrderNo;
+        end if;*/
+
+        return v_A_OrderNo;
+exception
+    when others then
+        rollback;
+        return -1;
+end;
+/
+
+prompt
+prompt Creating function FN_V_WITHDRAW
+prompt ===============================
+prompt
+create or replace function FN_V_Withdraw(
+    p_A_OrderNo          number,             --被撤单委托单号
+    p_WithdrawType       number,             --撤单类型 0：成交撤单；1：流拍撤单; 2:交易中撤单
+    p_amount             number              --撤单数量
+) return number
+/****
+ * 2012-03-21 by liuyu
+ * 竞价撤单
+ * 返回值
+ * 1  成功
+ * -1 失败
+ * -2 撤单数量超过范围
+****/
+as
+     v_FrozenMargin      number(15,2):=0;    --冻结保证金
+     v_FrozenFee         number(15,2):=0;    --冻结手续费
+     v_unFrozenMargin    number(15,2):=0;    --释放保证金
+     v_unFrozenFee       number(15,2):=0;    --释放手续费
+     v_OrderType         number(3):=3;       --委托状态（3：全部撤单；4：部分成交后撤单；5：部分撤单）
+     v_Margin            number(15,2):=0;    --保证金
+     v_Fee               number(15,2):=0;    --手续费
+     v_userID            varchar2(32);
+     v_tradePartition    number(3);          --交易板块（1：竞买；2：竞卖）
+     v_amount            number(16,6):=0;    --委托数量
+     v_validAmount       number(16,6):=0;    --有效成交数量
+     v_orderTime         timestamp;
+     v_F_FrozenFunds     number(15,2):=0;
+
+begin
+    -- 获取当前数据库时间
+    select systimestamp(6) into v_orderTime from dual;
+    --获取被撤单信息
+    begin
+        select FrozenMargin,FrozenFee,unFrozenMargin,unFrozenFee,userID,tradePartition,amount,validAmount
+          into v_FrozenMargin,v_FrozenFee,v_unFrozenMargin,v_unFrozenFee,v_userID,v_tradePartition,v_amount,v_validAmount
+         from v_curSubmit
+        where ID = p_A_OrderNo for update;
+    exception
+        when NO_DATA_FOUND then
+        select FrozenMargin,FrozenFee,unFrozenMargin,unFrozenFee,userID,tradePartition,amount,validAmount
+          into v_FrozenMargin,v_FrozenFee,v_unFrozenMargin,v_unFrozenFee,v_userID,v_tradePartition,v_amount,v_validAmount
+         from v_hisSubmit
+        where ID = p_A_OrderNo;
+    end;
+
+    if(p_WithdrawType=0) then --成交撤单
+         v_Margin := v_FrozenMargin - v_unFrozenMargin;
+         v_Fee := v_FrozenFee - v_unFrozenFee;
+         if(p_amount < v_validAmount) then
+             v_OrderType := 4; --部分成交后撤单
+         elsif(p_amount = v_validAmount) then
+             v_OrderType := 3;--全部撤单
+         end if;
+    elsif(p_WithdrawType=1) then --流拍撤单
+         v_Margin := v_FrozenMargin;
+         v_Fee := v_FrozenFee;
+         v_OrderType := 3;--全部撤单
+    elsif(p_WithdrawType=2) then --委托撤单
+         if(p_amount < v_validAmount) then--部分撤单
+             v_Margin := p_amount/v_amount*v_FrozenMargin;
+             v_Fee := p_amount/v_amount*v_FrozenFee;
+             v_OrderType := 5;--部分撤单
+         elsif(p_amount = v_validAmount) then--全部撤单
+             v_Margin := v_FrozenMargin - v_unFrozenMargin;
+             v_Fee := v_FrozenFee - v_unFrozenFee;
+             v_OrderType := 3;--全部撤单
+         else
+             return -2;
+         end if;
+    end if;
+
+    --更新委托表
+    update v_curSubmit set modifytime = v_orderTime,
+                           OrderType = v_OrderType,
+                           unFrozenMargin = unFrozenMargin + v_Margin,
+                           unFrozenFee = unFrozenFee + v_Fee,
+                           validAmount = validAmount - p_amount,
+                           WithdrawType = p_WithdrawType
+    where ID = p_A_OrderNo;
+    --更新冻结资金
+    v_F_FrozenFunds := FN_F_UpdateFrozenFunds(v_userID,-v_Margin-v_Fee,'21');
+
+    return 1;
+exception
+    when others then
+    rollback;
+    return -1;
+end;
+/
+
+prompt
+prompt Creating function FN_V_TRADEBUY
+prompt ===============================
+prompt
+create or replace function FN_V_TradeBuy(p_Code varchar2) return number
+/****
+ * 2013-12-16 by liuyu
+ * 竞买成交
+ * 返回值
+ * 1  成功
+ * -1 失败
+****/
+as
+    v_num         number(10,0);
+    v_FlowAmount  number(16,6):=0;           --流拍数量
+    v_amountSum   number(16,6):=0;           --委托数量
+    v_Balance     number(15,2);
+    v_Amount      number(16,6):=0;           --商品数量
+    v_commodityID varchar2(64);
+    v_beginPrice  number(15,2):=0;           --起拍价
+    v_alertPrice  number(15,2):=0;           --报警价
+    v_Qty         number(16,6):=0;           --成交数量
+    v_section     number(3);                 --所属交易节
+    v_tradeFlag   number(3):=1;              --成交标志（1：全部成交；2：部分成交）
+    v_userID      varchar2(32);              --交易用户
+    v_bailSum     number(12,2):=0;           --挂单方总保证金
+    v_poundageSum number(12,2):=0;           --挂单方总手续费
+    v_b_bail      number(12,2):=0;           --买方保证金
+    v_s_bail      number(12,2):=0;           --卖方保证金
+    v_b_poundage  number(12,2):=0;           --买方手续费
+    v_s_poundage  number(12,2):=0;           --卖方手续费
+    v_F_FrozenFunds     number(15,2):=0;
+    v_Withdraw    number(10);
+    v_withdrawQty number(16,6):=0;           --撤单数量
+    v_A_TradeNo   number(10);
+    v_orderTime       timestamp;
+    v_FlowAmountAlgr   number(2);            --流拍数量计算方式（0：百分比；1：绝对值）
+    v_Status           number(3);
+begin
+    -- 获取当前数据库时间
+    select systimestamp(6) into v_orderTime from dual;
+    --验证该标的是否已成交，如果已经存在该标的的成交，直接跳出函数
+    select Status into v_Status from v_commodity where Code = p_Code;
+    if(v_Status<>2) then
+        return 1;
+    end if;
+
+    --验证是否流拍
+    --1. 获取商品信息
+    select commodityID,   FlowAmount,   FlowAmountAlgr,   Amount,   userID
+      into v_commodityID, v_FlowAmount, v_FlowAmountAlgr, v_Amount, v_userID
+    from v_commodity where Code = p_Code;
+    --2. 汇总委托表中数量
+    select nvl(sum(amount),0) into v_amountSum from v_curSubmit where Code = p_Code;
+    --3. 获取所属交易节
+    select section into v_section from v_curCommodity where Code = p_Code;
+
+    --释放挂单方冻结资金并删除挂单冻结记录
+    select FrozenMargin,FrozenFee into v_bailSum,v_poundageSum from V_FundFrozen where Code = p_Code;
+    v_F_FrozenFunds := FN_F_UpdateFrozenFunds(v_userID,-v_bailSum-v_poundageSum,'21');
+    delete V_FundFrozen where Code = p_Code;
+
+    --计算流拍数量
+    if(v_FlowAmountAlgr=1) then--按百分比计算
+        v_FlowAmount := v_Amount*v_FlowAmount;
+    end if;
+    --如果委托数量小于流拍数量 则流拍
+    if(v_amountSum<v_FlowAmount) then--流拍
+        --循环调用撤单函数
+        for withdraw in (select ID,amount from v_curSubmit where Code = p_Code)
+          loop
+              v_Balance := FN_V_Withdraw(withdraw.ID,1,withdraw.amount);
+          end loop;
+        --更新当前交易商表
+        update v_curCommodity set bargainType = 3, modifyTime = sysdate where Code = p_Code;
+        --更新商品表状态
+        update v_commodity set Status=8 where Code = p_Code;
+    else
+        --按照价格优先、数量优先、时间优先的顺序排序(过滤已撤单)
+        for trade in (select ID,Price,amount,validAmount,userID,FrozenMargin,FrozenFee,unFrozenMargin,unFrozenFee from v_curSubmit where Code = p_Code and OrderType in (0,5) order by Price desc,amount desc,submitTime)
+          loop
+              if(v_Amount>0) then
+                  if(v_Amount < trade.amount) then --部分成交
+                      v_tradeFlag := 2;
+                      v_Qty := trade.validAmount;   --成交数量
+                      v_withdrawQty := trade.validAmount - v_Amount;
+                  else         --全部成交
+                      v_Qty := trade.amount;
+                      v_tradeFlag := 1;
+                  end if;
+
+                  --计算保证金和手续费
+                  if(v_Amount < trade.validAmount) then
+                      v_b_bail :=  FN_V_ComputeMargin(p_Code,1,v_Qty,trade.Price,trade.userID);
+                      v_b_poundage := FN_V_ComputeFee(p_Code,1,v_Qty,trade.Price,trade.userID);
+                  else
+                      v_b_bail :=  trade.FrozenMargin - trade.unFrozenMargin;
+                      v_b_poundage := trade.FrozenFee - trade.unFrozenFee;
+                  end if;
+
+                  --计算卖方保证金手续费
+                  v_s_bail :=  FN_V_ComputeMargin(p_Code,2,v_Qty,trade.Price,v_userID);
+                  v_s_poundage := FN_V_ComputeFee(p_Code,2,v_Qty,trade.Price,v_userID);
+
+
+                  --获取成交号
+                  select SP_V_BARGAIN.nextval into v_A_TradeNo from dual;
+                  --写成交
+                  insert into v_bargain
+                     (contractID,  tradePartition, Section,   submitID, Code,   commodityID,   Price,       Amount, userID,       TradeTime,   b_bail,   s_bail,   b_poundage,   s_poundage)
+                  values
+                     (v_A_TradeNo, 1,              v_section, trade.ID, p_Code, v_commodityID, trade.Price, v_Qty,  trade.userID, sysdate,   v_b_bail, v_s_bail, v_b_poundage, v_s_poundage);
+
+                  --改委托
+                  update v_curSubmit set OrderType=v_tradeFlag,
+                                         modifytime=v_orderTime,
+                                         unFrozenMargin=unFrozenMargin+v_b_bail,
+                                         unFrozenFee=unFrozenFee+v_b_poundage
+                                     where id = trade.ID;
+                  --释放买方冻结资金
+                  v_F_FrozenFunds := FN_F_UpdateFrozenFunds(trade.userID,-v_b_bail-v_b_poundage,'21');
+                  --收双方保证金、手续费（写流水）
+                  --卖方
+                  v_Balance := FN_F_UpdateFundsFull(v_userID,'21002',v_s_bail,v_A_TradeNo,v_commodityID,null,null);
+                  v_Balance := FN_F_UpdateFundsFull(v_userID,'21001',v_s_poundage,v_A_TradeNo,v_commodityID,null,null);
+                  --买方
+                  v_Balance := FN_F_UpdateFundsFull(trade.userID,'21002',v_b_bail,v_A_TradeNo,v_commodityID,null,null);
+                  v_Balance := FN_F_UpdateFundsFull(trade.userID,'21001',v_b_poundage,v_A_TradeNo,v_commodityID,null,null);
+                  --如果部分成交需要成交后撤单
+                  if(v_tradeFlag=2 and v_withdrawQty >0) then
+                      v_Withdraw := FN_V_Withdraw(trade.ID,0,v_withdrawQty);
+                  end if;
+
+                  --成交后递减商品数量
+                  v_Amount := v_Amount - v_Qty;
+              else
+                  --如果配对成交后有多余的委托单需要做撤单处理
+                  v_Withdraw := FN_V_Withdraw(trade.ID,0,trade.amount);
+              end if;
+
+          end loop;
+
+        --更新当前交易商品表
+        update v_curCommodity set bargainType = 1, modifyTime =sysdate where Code = p_Code;
+        --更新商品表状态
+        update v_commodity set Status=1 where Code = p_Code;
+    end if;
+    return 1;
+exception
+    when others then
+    rollback;
+    return -1;
+end;
+/
+
+prompt
+prompt Creating function FN_V_TRADESELL
+prompt ================================
+prompt
+create or replace function FN_V_TradeSell(p_Code varchar2) return number
+/****
+ * 2013-12-16 by liuyu
+ * 竞卖成交
+ * 返回值
+ * 1  成功
+ * -1 失败
+****/
+as
+    v_num         number(10,0);
+    v_FlowAmount  number(16,6):=0;           --流拍数量
+    v_amountSum   number(16,6):=0;           --委托数量
+    v_Balance     number(15,2);
+    v_Amount      number(16,6):=0;           --商品数量
+    v_commodityID varchar2(64);
+    v_beginPrice  number(15,2):=0;           --起拍价
+    v_alertPrice  number(15,2):=0;           --报警价
+    v_Qty         number(16,6):=0;           --成交数量
+    v_section     number(3);                 --所属交易节
+    v_tradeFlag   number(3):=1;              --成交标志（1：全部成交；2：部分成交）
+    v_userID      varchar2(32);              --交易用户
+    v_bailSum     number(12,2):=0;           --挂单方总保证金
+    v_poundageSum number(12,2):=0;           --挂单方总手续费
+    v_b_bail      number(12,2):=0;           --买方保证金
+    v_s_bail      number(12,2):=0;           --卖方保证金
+    v_b_poundage  number(12,2):=0;           --买方手续费
+    v_s_poundage  number(12,2):=0;           --卖方手续费
+    v_F_FrozenFunds     number(15,2):=0;
+    v_Withdraw    number(10);
+    v_withdrawQty number(16,6):=0;           --撤单数量
+    v_A_TradeNo   number(10);
+    v_orderTime       timestamp;
+    v_FlowAmountAlgr   number(2);            --流拍数量计算方式（0：百分比；1：绝对值）
+    v_Status           number(3);
+begin
+    -- 获取当前数据库时间
+    select systimestamp(6) into v_orderTime from dual;
+    --1. 验证该标的是否已成交，如果已经存在该标的的成交，直接跳出函数
+    select Status into v_Status from v_commodity where Code = p_Code;
+    if(v_Status<>2) then
+        return 1;
+    end if;
+
+    --获取商品信息
+    select commodityID,   FlowAmount,   FlowAmountAlgr,   Amount,   userID
+      into v_commodityID, v_FlowAmount, v_FlowAmountAlgr, v_Amount, v_userID
+    from v_commodity where Code = p_Code;
+    --汇总委托表中数量
+    select nvl(sum(amount),0) into v_amountSum from v_curSubmit where Code = p_Code;
+    --获取所属交易节
+    select section into v_section from v_curCommodity where Code = p_Code;
+
+    --2. 释放挂单方冻结资金并删除挂单冻结记录
+    select FrozenMargin,FrozenFee into v_bailSum,v_poundageSum from V_FundFrozen where Code = p_Code;
+    v_F_FrozenFunds := FN_F_UpdateFrozenFunds(v_userID,-v_bailSum-v_poundageSum,'21');
+    delete V_FundFrozen where Code = p_Code;
+
+    --计算流拍数量
+    if(v_FlowAmountAlgr=1) then--按百分比计算
+        v_FlowAmount := v_Amount*v_FlowAmount;
+    end if;
+    --3. 如果委托数量小于流拍数量 则流拍
+    if(v_amountSum<v_FlowAmount) then--流拍
+        --循环调用撤单函数
+        for withdraw in (select ID,amount from v_curSubmit where Code = p_Code)
+          loop
+              v_Balance := FN_V_Withdraw(withdraw.ID,1,withdraw.amount);
+          end loop;
+        --更新当前交易商表
+        update v_curCommodity set bargainType = 3, modifyTime = sysdate where Code = p_Code;
+        --更新商品表状态
+        update v_commodity set Status=8 where Code = p_Code;
+    else
+
+        --4. 按照价格优先、数量优先、时间优先的顺序排序(过滤已撤单)
+        for trade in (select ID,Price,amount,validAmount,userID,FrozenMargin,FrozenFee,unFrozenMargin,unFrozenFee from v_curSubmit where Code = p_Code and OrderType in (0,5) order by Price,amount desc,submitTime)
+            loop
+                if(v_Amount>0) then
+                    if(v_Amount<trade.amount) then --部分成交
+                        v_tradeFlag := 2;
+                        v_Qty := trade.validAmount;   --成交数量
+                        v_withdrawQty := trade.validAmount - v_Amount;
+                    else         --全部成交
+                        v_Qty := trade.amount;
+                        v_tradeFlag := 1;
+                    end if;
+
+                    --计算保证金和手续费
+                    if(v_Amount < trade.validAmount) then
+                        v_s_bail :=  FN_V_ComputeMargin(p_Code,2,v_Qty,trade.Price,trade.userID);
+                        v_s_poundage := FN_V_ComputeFee(p_Code,2,v_Qty,trade.Price,trade.userID);
+                    else
+                        v_s_bail :=  trade.FrozenMargin - trade.unFrozenMargin;
+                        v_s_poundage := trade.FrozenFee - trade.unFrozenFee;
+                    end if;
+
+                    --计算买方保证金手续费
+                    v_b_bail :=  FN_V_ComputeMargin(p_Code,1,v_Qty,trade.Price,v_userID);
+                    v_b_poundage := FN_V_ComputeFee(p_Code,1,v_Qty,trade.Price,v_userID);
+
+                    --获取成交号
+                    select SP_V_BARGAIN.nextval into v_A_TradeNo from dual;
+                    --写成交
+                    insert into v_bargain
+                       (contractID,  tradePartition, submitID, Code,   commodityID,   Price,       Amount, userID,       TradeTime, Section,   b_bail,   s_bail,   b_poundage,   s_poundage)
+                    values
+                       (v_A_TradeNo, 2,              trade.ID, p_Code, v_commodityID, trade.Price, v_Qty,  trade.userID, sysdate,   v_section, v_b_bail, v_s_bail, v_b_poundage, v_s_poundage);
+
+                    --改委托
+                    update v_curSubmit set OrderType=v_tradeFlag,
+                                           modifytime=v_orderTime,
+                                           unFrozenMargin=unFrozenMargin+v_s_bail,
+                                           unFrozenFee=unFrozenFee+v_s_poundage
+                                       where id = trade.ID;
+                    --释放卖方冻结资金
+                    v_F_FrozenFunds := FN_F_UpdateFrozenFunds(trade.userID,-v_s_bail-v_s_poundage,'21');
+                    --收双方保证金、手续费（写流水）
+                    --买方
+                    v_Balance := FN_F_UpdateFundsFull(v_userID,'21002',v_b_bail,v_A_TradeNo,v_commodityID,null,null);
+                    v_Balance := FN_F_UpdateFundsFull(v_userID,'21001',v_b_poundage,v_A_TradeNo,v_commodityID,null,null);
+                    --卖方
+                    v_Balance := FN_F_UpdateFundsFull(trade.userID,'21002',v_s_bail,v_A_TradeNo,v_commodityID,null,null);
+                    v_Balance := FN_F_UpdateFundsFull(trade.userID,'21001',v_s_poundage,v_A_TradeNo,v_commodityID,null,null);
+                    --如果部分成交需要成交后撤单
+                    if(v_tradeFlag=2 and v_withdrawQty>0) then
+                        v_Withdraw := FN_V_Withdraw(trade.ID,0,v_withdrawQty);
+                    end if;
+
+                    --成交后递减商品数量
+                    v_Amount := v_Amount - v_Qty;
+                else
+                    --如果配对成交后有多余的委托单需要做撤单处理
+                    v_Withdraw := FN_V_Withdraw(trade.ID,0,trade.amount);
+                end if;
+            end loop;
+
+        --更新当前交易商品表
+        update v_curCommodity set bargainType = 1, modifyTime =sysdate where Code = p_Code;
+        --更新商品表状态
+        update v_commodity set Status=1 where Code = p_Code;
+    end if;
+    return 1;
+exception
+    when others then
+    rollback;
+    return -1;
+end;
+/
+
+prompt
+prompt Creating function FN_V_TRADETENDER
+prompt ==================================
+prompt
+create or replace function FN_V_TradeTender(p_Code varchar2) return number
+/****
+ * 2013-12-16 by liuyu
+ * 招标成交（交易节结束时调用）
+ * 返回值
+ * 1  成功
+ * -1 失败
+****/
+as
+    v_num         number(10,0);
+    v_Balance     number(15,2);
+    v_Amount      number(16,6):=0;           --商品数量
+    v_commodityID varchar2(64);
+    v_beginPrice  number(15,2):=0;           --起拍价
+    v_alertPrice  number(15,2):=0;           --报警价
+    v_Qty         number(16,6):=0;           --成交数量
+    v_userID      varchar2(32);              --交易用户
+    v_bs_flag     number(2);                 --买卖方向（1：买；2：卖）
+
+    type c_v_curSubmit is ref cursor;
+	  v_trade c_v_curSubmit;
+    v_sql varchar2(500);
+    v_where varchar2(50);
+
+    v_oradeby       varchar2(16):='';
+
+    v_id            number(12);
+    v_Price         number(12,2);
+    v_orderamount   number(16,6);
+    v_validAmount   number(16,6);
+    v_orderuserID   varchar2(64);
+    v_FrozenMargin  number(15,2):=0;
+    v_FrozenFee     number(15,2):=0;
+    v_unFrozenMargin  number(15,2):=0;
+    v_unFrozenFee   number(15,2):=0;
+begin
+    --1. 验证该标的是否已经产生成交，如果已经存在该标的的成交，直接跳出函数
+    select count(*) into v_num from v_curSubmitTenderPlan where Code = p_Code;
+    if(v_num>0) then
+        return 1;
+    end if;
+
+    --2. 获取商品信息
+    select commodityID,   Amount,   beginPrice,   alertPrice,   userID,   bs_flag
+      into v_commodityID, v_Amount, v_beginPrice, v_alertPrice, v_userID, v_bs_flag
+    from v_commodity where Code = p_Code;
+
+    --3.将委托表符合价格区间的委托导入到招标委托表中
+    if(v_bs_flag = 1) then
+        insert into v_curSubmitTender
+              (id, tradepartition, code, price, amount, userid, traderId, submittime, OrderType, validamount, modifytime, FrozenMargin, FrozenFee, unFrozenMargin, unFrozenFee, WithdrawType)
+        select id, tradepartition, code, price, amount, userid, traderID, submittime, OrderType, validamount, modifytime, FrozenMargin, FrozenFee, unFrozenMargin, unFrozenFee, WithdrawType
+          from v_cursubmit
+         where code = p_Code and Price <= v_beginPrice and Price >= v_alertPrice;
+    else
+        insert into v_curSubmitTender
+              (id, tradepartition, code, price, amount, userid, traderId, submittime, OrderType, validamount, modifytime, FrozenMargin, FrozenFee, unFrozenMargin, unFrozenFee, WithdrawType)
+        select id, tradepartition, code, price, amount, userid, traderID, submittime, OrderType, validamount, modifytime, FrozenMargin, FrozenFee, unFrozenMargin, unFrozenFee, WithdrawType
+          from v_cursubmit
+         where code = p_Code and Price >= v_beginPrice and Price <= v_alertPrice;
+    end if;
+
+
+    --4.按照价格优先、数量优先、时间优先的顺序排序(过滤不符合价格区间的委托)
+    v_where := ' and Price <= '||v_beginPrice||' and Price >= '||v_alertPrice;
+    if(v_bs_flag = 2) then
+        v_oradeby := ' desc ';
+        v_where := ' and Price >= '||v_beginPrice||' and Price <= '||v_alertPrice;
+    end if;
+    v_sql := 'select ID,Price,amount,validAmount,userID,FrozenMargin,FrozenFee,unFrozenMargin,unFrozenFee from v_curSubmit where Code = '''||p_Code||''' and OrderType in (0,5) '||v_where||' order by Price'||v_oradeby||',amount desc,submitTime';
+    open v_trade for v_sql;
+        loop
+            fetch v_trade into v_id,v_Price,v_orderamount,v_validAmount,v_orderuserID,v_FrozenMargin,v_FrozenFee,v_unFrozenMargin,v_unFrozenFee;
+            exit when v_trade%NOTFOUND;
+                if(v_Amount>0) then
+                    if(v_Amount<v_orderamount) then --部分成交
+                        v_Qty := v_Amount;
+                    else         --全部成交
+                        v_Qty := v_orderamount;
+                    end if;
+
+                    --将默认成交记录导入招标计划委托表
+                    insert into v_curSubmitTenderPlan
+                          (id, tradepartition, code, price, amount, ConfirmAmount, userid, traderId, submittime, OrderType, validamount, modifytime, FrozenMargin, FrozenFee, unFrozenMargin, unFrozenFee, WithdrawType)
+                    select id, tradepartition, code, price, amount, v_Qty,         userid, traderID, submittime, OrderType, validamount, modifytime, FrozenMargin, FrozenFee, unFrozenMargin, unFrozenFee, WithdrawType
+                      from v_cursubmit
+                     where id = v_id;
+
+                    --成交后递减商品数量
+                    v_Amount := v_Amount - v_Qty;
+                end if;
+
+        end loop;
+        close v_trade;
+
+    --5. 将不符合价格区间的委托进行撤单
+    if(v_bs_flag = 1) then
+        for otherwithdraw in (select ID,amount from v_curSubmit where Code = p_Code and (Price > v_beginPrice or Price < v_alertPrice))
+            loop
+                v_Balance := FN_V_Withdraw(otherwithdraw.ID,0,otherwithdraw.amount);
+            end loop;
+    else
+        for otherwithdraw in (select ID,amount from v_curSubmit where Code = p_Code and (Price > v_alertPrice or Price < v_beginPrice ))
+            loop
+                v_Balance := FN_V_Withdraw(otherwithdraw.ID,0,otherwithdraw.amount);
+            end loop;
+    end if;
+
+
+    --6. 更新当前交易商品表
+    update v_curCommodity set bargainType = 1, modifyTime =sysdate where Code = p_Code;
+    --7. 更新商品表状态
+    update v_commodity set Status=1,TenderTradeConfirm = 0 where Code = p_Code;
+
+    return 1;
+exception
+    when others then
+    rollback;
+    return -1;
+end;
+/
+
+prompt
+prompt Creating function FN_V_TRADETENDERAUDIT
+prompt =======================================
+prompt
+create or replace function FN_V_TradeTenderAudit(p_Code varchar2) return number
+/****
+ * 2013-12-16 by liuyu
+ * 招标成交确认
+ * 返回值
+ * 1  成功
+ * -1 失败
+ * -2 确认数量大于商品数量
+****/
+as
+    v_Balance     number(15,2);
+    v_Amount      number(16,6):=0;           --商品数量
+    v_commodityID varchar2(64);
+    v_beginPrice  number(15,2):=0;           --起拍价
+    v_alertPrice  number(15,2):=0;           --报警价
+    v_Qty         number(16,6):=0;           --成交数量
+    v_section     number(3);                 --所属交易节
+    v_tradeFlag   number(3):=1;              --成交标志（1：全部成交；2：部分成交）
+    v_userID      varchar2(32);              --交易用户
+    v_bailSum     number(12,2):=0;           --挂单方总保证金
+    v_poundageSum number(12,2):=0;           --挂单方总手续费
+    v_b_bail      number(12,2):=0;           --买方保证金
+    v_s_bail      number(12,2):=0;           --卖方保证金
+    v_b_poundage  number(12,2):=0;           --买方手续费
+    v_s_poundage  number(12,2):=0;           --卖方手续费
+    v_c_bail      number(12,2):=0;           --投标方保证金
+    v_m_bail      number(12,2):=0;           --挂标方保证金
+    v_c_poundage  number(12,2):=0;           --投标方手续费
+    v_m_poundage  number(12,2):=0;           --挂标方手续费
+    v_F_FrozenFunds     number(15,2):=0;
+    v_Withdraw    number(10);
+    v_withdrawQty number(16,6):=0;           --撤单数量
+    v_A_TradeNo   number(10);
+    v_orderTime       timestamp;
+    v_TenderTradeConfirm  number(2);         --招标成交确认（0：未确认；1：已确认）
+    v_ConfirmAmount       number(16,6):=0;   --确认成交数量汇总
+    v_bs_flag             number(2);         --商品买卖方向
+    v_bs_flag_c           number(2);         --投标方买卖方向
+    v_num                 number(3);
+begin
+    --获取当前数据库时间
+    select systimestamp(6) into v_orderTime from dual;
+
+    --1. 验证该标的是否已经确认成交，如果该标的已经确认成交，直接跳出函数
+    select TenderTradeConfirm into v_TenderTradeConfirm from v_commodity where Code = p_Code;
+    if(v_TenderTradeConfirm=1) then
+        return 1;
+    end if;
+
+    --获取商品信息
+    select commodityID,   Amount,   beginPrice,   alertPrice,   userID,   bs_flag
+      into v_commodityID, v_Amount, v_beginPrice, v_alertPrice, v_userID, v_bs_flag
+    from v_commodity where Code = p_Code;
+
+    --2. 验证商品数量是否满足成交数量，不满足直接退出
+    select nvl(sum(ConfirmAmount),0) into v_ConfirmAmount from v_curSubmitTenderPlan where code = p_Code;
+    if(v_ConfirmAmount > v_Amount) then
+         return -2;
+    end if;
+
+    --获取所属交易节
+    select count(*) into v_num from v_curCommodity where Code = p_Code;
+    if(v_num = 1) then
+        select section into v_section from v_curCommodity where Code = p_Code;
+    else
+        select max(nvl(section,0)) into v_section from v_hisCommodity where Code = p_Code;
+    end if;
+    --select section into v_section from (select section from v_curCommodity where Code = p_Code union select section from v_hisCommodity where Code = p_Code);
+
+    --3. 释放挂单方冻结资金并删除挂单冻结记录
+    select FrozenMargin,FrozenFee into v_bailSum,v_poundageSum from V_FundFrozen where Code = p_Code;
+    v_F_FrozenFunds := FN_F_UpdateFrozenFunds(v_userID,-v_bailSum-v_poundageSum,'21');
+    delete V_FundFrozen where Code = p_Code;
+
+    --根据商品买卖方向确定委托买卖方向
+    if(v_bs_flag=1) then
+       v_bs_flag_c := 2;
+    else
+       v_bs_flag_c := 1;
+    end if;
+
+    --4. 按照价格优先、数量优先、时间优先的顺序排序(过滤不符合价格区间的委托)
+    for trade in (select ID,Price,amount,ConfirmAmount,validAmount,userID,FrozenMargin,FrozenFee,unFrozenMargin,unFrozenFee from v_curSubmitTenderPlan where Code = p_Code)
+        loop
+            if(trade.ConfirmAmount<trade.amount) then --部分成交
+                v_tradeFlag := 2;
+                --v_Qty := trade.ConfirmAmount;   --成交数量
+                v_withdrawQty := trade.amount - trade.ConfirmAmount;
+            else         --全部成交
+                --v_Qty := trade.amount;
+                v_tradeFlag := 1;
+            end if;
+
+            --成交数量
+            v_Qty := trade.ConfirmAmount;
+
+            --计算投标方保证金和手续费
+            if(trade.ConfirmAmount<trade.amount) then
+                v_c_bail :=  FN_V_ComputeMargin(p_Code,v_bs_flag_c,v_Qty,trade.Price,trade.userID);
+                v_c_poundage := FN_V_ComputeFee(p_Code,v_bs_flag_c,v_Qty,trade.Price,trade.userID);
+            else
+                v_c_bail :=  trade.FrozenMargin - trade.unFrozenMargin;
+                v_c_poundage := trade.FrozenFee - trade.unFrozenFee;
+            end if;
+
+            --计算挂单方保证金手续费
+            v_m_bail :=  FN_V_ComputeMargin(p_Code,v_bs_flag,v_Qty,trade.Price,v_userID);
+            v_m_poundage := FN_V_ComputeFee(p_Code,v_bs_flag,v_Qty,trade.Price,v_userID);
+
+            if(v_bs_flag=1) then --如果挂标方为买方
+                v_b_bail := v_m_bail;
+                v_s_bail := v_c_bail;
+                v_b_poundage := v_m_poundage;
+                v_s_poundage := v_c_poundage;
+            else
+                v_b_bail := v_c_bail;
+                v_s_bail := v_m_bail;
+                v_b_poundage := v_c_poundage;
+                v_s_poundage := v_m_poundage;
+            end if;
+
+            --获取成交号
+            select SP_V_BARGAIN.nextval into v_A_TradeNo from dual;
+            --写成交
+            insert into v_bargain
+               (contractID,  tradePartition, submitID, Code,   commodityID,   Price,       Amount, userID,       TradeTime, Section,   b_bail,   s_bail,   b_poundage,   s_poundage)
+            values
+               (v_A_TradeNo, 3,              trade.ID, p_Code, v_commodityID, trade.Price, v_Qty,  trade.userID, sysdate,   v_section, v_b_bail, v_s_bail, v_b_poundage, v_s_poundage);
+
+            --改委托(当前表和历史表都有可能有数据)
+            --1） 当前表
+            update v_curSubmit set OrderType=v_tradeFlag,
+                                   modifytime=v_orderTime,
+                                   unFrozenMargin=unFrozenMargin+v_s_bail,
+                                   unFrozenFee=unFrozenFee+v_s_poundage
+                               where id = trade.ID;
+            --2） 历史表
+            update v_hisSubmit set OrderType=v_tradeFlag,
+                                   modifytime=v_orderTime,
+                                   unFrozenMargin=unFrozenMargin+v_s_bail,
+                                   unFrozenFee=unFrozenFee+v_s_poundage
+                               where id = trade.ID;
+
+            --释放卖方冻结资金
+            v_F_FrozenFunds := FN_F_UpdateFrozenFunds(trade.userID,-v_c_bail-v_c_poundage,'21');
+            --收双方保证金、手续费（写流水）
+            --挂单方
+            v_Balance := FN_F_UpdateFundsFull(v_userID,'21002',v_m_bail,v_A_TradeNo,v_commodityID,null,null);
+            v_Balance := FN_F_UpdateFundsFull(v_userID,'21001',v_m_poundage,v_A_TradeNo,v_commodityID,null,null);
+            --投标方
+            v_Balance := FN_F_UpdateFundsFull(trade.userID,'21002',v_c_bail,v_A_TradeNo,v_commodityID,null,null);
+            v_Balance := FN_F_UpdateFundsFull(trade.userID,'21001',v_c_poundage,v_A_TradeNo,v_commodityID,null,null);
+            --如果部分成交需要成交后撤单
+            if(v_tradeFlag=2 and v_withdrawQty>0) then
+                v_Withdraw := FN_V_Withdraw(trade.ID,0,v_withdrawQty);
+            end if;
+
+            --成交后递减商品数量
+            v_Amount := v_Amount - v_Qty;
+        end loop;
+
+
+    --5. 将未中标委托进行撤单
+    for otherwithdraw in (select ID,amount from v_curSubmitTender where Code = p_Code and id not in (select id from v_curSubmitTenderPlan where Code = p_Code))
+        loop
+            v_Balance := FN_V_Withdraw(otherwithdraw.ID,0,otherwithdraw.amount);
+        end loop;
+
+    --6. 清空招标委托表
+    delete v_curSubmitTender where Code = p_Code;
+
+    --更新当前交易商品表
+    --update v_curCommodity set bargainType = 1, modifyTime =sysdate where Code = p_Code;
+    --7. 更新商品表状态
+    update v_commodity set TenderTradeConfirm = 1 where Code = p_Code;
+
+    return 1;
+exception
+    when others then
+    rollback;
+    return -1;
+end;
+/
+
+prompt
+prompt Creating procedure SP_V_FIRMADD
+prompt ===============================
+prompt
+CREATE OR REPLACE PROCEDURE SP_V_FirmAdd( P_FIRMID in VARCHAR2)
+ /****
+  *增加交易商
+  *
+  *****/
+as
+     v_cnt number(5);
+begin
+    select count(*) into v_cnt from v_tradeuser where usercode=p_firmid;
+    if(v_cnt>0) then
+           return;
+    end if;
+ --插入交易商表，默认有竞价权限、无挂单权限
+ insert into v_tradeuser(usercode,isEntry,limits)
+ values(P_FIRMID,0,0);
+end;
+/
+
+prompt
+prompt Creating procedure SP_V_FIRMDEL
+prompt ===============================
+prompt
+create or replace procedure SP_V_FirmDel(p_FirmID varchar2) as
+/**
+ * 竞价删除交易商科目
+ **/
+begin
+  delete from v_tradeuser where usercode=p_firmid;
+
+  update v_hisbargain set userid=userid||'_D' where userid=p_FirmID;
+  --update v_hismoney set firmid=firmid||'_D' where firmid=p_FirmID;
+  update v_hissubmit set userid=userid||'_D' where userid=p_FirmID;
+end;
+/
+
+
+spool off

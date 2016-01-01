@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="GBK"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.vendue.mgr.model.firmSet.tradeUser.FirmFunds" table="F_FirmFunds" dynamic-update="true" lazy="false">
+		<id name="firmID">
+			<generator class="foreign">
+				<param name="property">tradeUser</param>
+			</generator>
+		</id>
+		<property name="Balance"></property>
+		<property name="FrozenFunds"></property>
+		<property name="LastBalance"></property>
+		<property name="LastWarranty"></property>
+		<property name="SettleMargin"></property>
+		<property name="LastSettleMargin"></property>
+		<one-to-one name="tradeUser" class="gnnt.MEBS.vendue.mgr.model.firmSet.tradeUser.TradeUserModel"></one-to-one>
+	</class>
+</hibernate-mapping>

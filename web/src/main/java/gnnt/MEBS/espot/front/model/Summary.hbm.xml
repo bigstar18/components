@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.Summary" table="F_Summary" dynamic-insert="true" dynamic-update="true">
+		<id name="summaryNo"/>
+		<property name="summary"/>
+		<property name="ledgerItem"/>
+		<property name="fundDCFlag"/>
+		<property name="accountCodeOpp"/>
+		<property name="appendAccount"/>
+	</class>
+</hibernate-mapping>

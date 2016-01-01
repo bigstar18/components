@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="gnnt.MEBS.vendue.mgr.model.system.flowcontrol.FlowControl" table="V_FLOWCONTROL" dynamic-update="true" lazy="false">
+        <composite-id name="id" class="gnnt.MEBS.vendue.mgr.model.system.flowcontrol.FlowcontrolId">
+            <key-property name="tradepartition"></key-property>
+            <key-property name="unittype"></key-property>
+            <key-property name="unitid" ></key-property>
+        </composite-id>
+        <property name="breedid" ></property>
+        <property name="startmode"></property>
+        <property name="starttime"></property>
+        <property name="durativetime"></property>
+        <property name="countdownstart"></property>
+        <property name="countdowntime"></property>
+        <property name="quartertime"></property>
+        <property name="forcedendtime"></property>
+        <property name="ismargincount"></property>
+    </class>
+</hibernate-mapping>

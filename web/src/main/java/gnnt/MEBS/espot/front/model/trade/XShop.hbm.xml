@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.trade.XShop" table="E_SHOP" dynamic-insert="true" dynamic-update="true">
+		<id name="firmID"/>
+		<property name="shopName"/>
+		<property name="shopLevel"/>
+		<property name="description"/>
+		<many-to-one name="belongtoFirm" class="gnnt.MEBS.common.front.model.integrated.MFirm" column="firmID" insert="false" update="false"/>
+		<property name="headImage" type="org.springframework.orm.hibernate3.support.BlobByteArrayType"></property>
+	</class>
+</hibernate-mapping>

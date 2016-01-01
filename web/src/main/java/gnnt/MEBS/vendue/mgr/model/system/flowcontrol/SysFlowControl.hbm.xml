@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="gnnt.MEBS.vendue.mgr.model.system.flowcontrol.SysFlowControl" table="v_sysProperty" dynamic-update="true" lazy="false">
+	<id name="tradePartition"/>
+	<property name="durativeTime"/>
+	<property name="spaceTime"/>
+	<property name="countdownStart"/>
+	<property name="countdownTime"/>
+	<property name="breedId"></property>
+    </class>
+</hibernate-mapping>

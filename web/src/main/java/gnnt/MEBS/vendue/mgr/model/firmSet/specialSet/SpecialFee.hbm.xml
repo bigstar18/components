@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="gnnt.MEBS.vendue.mgr.model.firmSet.specialSet.SpecialFee" table="V_FirmSpecialFee" dynamic-update="true" lazy="false">
+        <composite-id name="id" class="gnnt.MEBS.vendue.mgr.model.firmSet.specialSet.SpecialFeeId">
+            <key-property name="userCode"></key-property>
+            <key-property name="breedId"></key-property>
+            <key-property name="bs_flag" ></key-property>
+        </composite-id>
+        <property name="feeAlgr" ></property>
+        <property name="fee"></property>
+        <property name="updateTime"></property>
+
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="gnnt.MEBS.vendue.mgr.model.commodity.curCommodities.CurCommodity" table="V_CURCOMMODITY" dynamic-update="true" lazy="false">
+		<id name="code"></id>
+        <property name="tradePartition" />
+        <property name="commodityId" />
+        <property name="section" />
+        <property name="bargainType" />
+        <property name="modifyTime" />
+    </class>
+</hibernate-mapping>

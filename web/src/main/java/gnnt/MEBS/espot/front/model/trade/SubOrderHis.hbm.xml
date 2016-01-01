@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.trade.SubOrderHis" table="E_SubOrder_H" dynamic-insert="true" dynamic-update="true">
+		<id name="subOrderID"/>
+		<property name="subFirmID"/>
+		<property name="quantity"/>
+		<property name="price"/>
+		<property name="wareHouseID"/>
+		<property name="tradePreTime"/>
+		<property name="deliveryMargin_B"/>
+		<property name="deliveryMargin_S"/>
+		<property name="remark"/>
+		<property name="status"/>
+		<property name="withdrawer"/>
+		<property name="withdrawTime"/>
+		<property name="createTime"/>
+		<property name="reply"/>
+		<property name="replyTime"/>
+		<property name="deliveryPreTime"/>
+		<property name="frozenMargin"/>
+		<many-to-one name="belongtoOrder" column="orderID" class="gnnt.MEBS.espot.front.model.trade.OrderHis"/>
+		<many-to-one name="belongtoFirm" column="subFirmID" class="gnnt.MEBS.common.front.model.integrated.MFirm" insert="false" update="false"/>
+	</class>
+</hibernate-mapping>

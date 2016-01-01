@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.trade.TradeProcessLog" table="E_TradeProcessLog" dynamic-insert="true" dynamic-update="true">
+		<id name="logId">
+			<generator class="native">
+				<param name="sequence">SEQ_X_TRADEPROCESSLOG</param>
+			</generator>
+		</id>
+		<many-to-one name="firm" column="firmId" class="gnnt.MEBS.common.front.model.integrated.MFirm"/>
+		<many-to-one name="trade" column="tradeNo" class="gnnt.MEBS.espot.front.model.trade.Trade"/>
+		<property name="operator" />
+		<property name="processInfo" />
+		<property name="processTime" />
+	</class>
+</hibernate-mapping>

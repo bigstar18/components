@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="GBK"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-2.5.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+	<!-- 前台系统维护的所有模块的 map 集合，key：moduleID(模块编号) value：moduleMsg(模块信息，其中信息依然以 Map 形式存储) -->
+	<util:map id="tradeModuleMap" map-class="java.util.LinkedHashMap" key-type="java.lang.Integer" value-type="java.util.Map">
+		<entry key="99" value-ref="module99"/><!-- 公用系统 -->
+		<entry key="98" value-ref="module98"/><!-- 模拟系统 -->
+		<entry key="10" value-ref="module10"/><!-- 综合系统 -->
+		<entry key="13" value-ref="module13"/><!-- 仓单系统 -->
+		<entry key="14" value-ref="module14"/><!-- 融资系统 -->
+		<entry key="23" value-ref="module23"/><!-- E现货系统 -->
+	</util:map>
+
+	<!-- 公用系统配置信息 -->
+	<util:map id="module99" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="isFirmset" value="N"/><!-- 是否有前台菜单 -->
+		<entry key="cnName" value="公用系统"/><!-- 中文名称 -->
+		<entry key="enName" value="common"/><!-- 英文名称 -->
+		<entry key="shortName" value="公用系统"/><!-- 中文简称 -->
+		<entry key="contextName" value="common_front"/><!-- 部署在tomcat中的名称 -->
+		<entry key="serverPic" value="common.gif"/><!-- 展示图片 -->
+		<entry key="serverPath" value="http://127.0.0.1:8080/"/><!-- 服务地址 -->
+	</util:map>
+
+	<!-- 模拟系统配置信息 -->
+	<util:map id="module98" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="isFirmset" value="Y"/><!-- 是否有前台菜单 -->
+		<entry key="cnName" value="模拟系统"/><!-- 中文名称 -->
+		<entry key="enName" value="demo"/><!-- 英文名称 -->
+		<entry key="shortName" value="模拟系统"/><!-- 中文简称 -->
+		<entry key="contextName" value="demo_front"/><!-- 部署在tomcat中的名称 -->
+		<entry key="serverPic" value="demo.gif"/><!-- 展示图片 -->
+		<entry key="serverPath" value=""/><!-- 服务地址 -->
+	</util:map>
+
+	<!-- 综合系统配置信息 -->
+	<util:map id="module10" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="isFirmset" value="Y"/><!-- 是否有前台菜单 -->
+		<entry key="cnName" value="综合系统"/><!-- 中文名称 -->
+		<entry key="enName" value="integrated"/><!-- 英文名称 -->
+		<entry key="shortName" value="综合系统"/><!-- 中文简称 -->
+		<entry key="contextName" value="integrated_front"/><!-- 部署在tomcat中的名称 -->
+		<entry key="serverPic" value="integrated.gif"/><!-- 展示图片 -->
+		<entry key="serverPath" value=""/><!-- 服务地址 -->
+	</util:map>
+
+	<!-- 仓单系统配置信息 -->
+	<util:map id="module13" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="isFirmset" value="Y"/><!-- 是否有前台菜单 -->
+		<entry key="cnName" value="仓单管理系统"/><!-- 中文名称 -->
+		<entry key="enName" value="bill"/><!-- 英文名称 -->
+		<entry key="shortName" value="仓单系统"/><!-- 中文简称 -->
+		<entry key="contextName" value="bill_front"/><!-- 部署在tomcat中的名称 -->
+		<entry key="serverPic" value="bill.gif"/><!-- 展示图片 -->
+		<entry key="serverPath" value=""/><!-- 服务地址 -->
+	</util:map>
+
+	<!-- 融资系统配置信息 -->
+	<util:map id="module14" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="isFirmset" value="Y"/><!-- 是否有前台菜单 -->
+		<entry key="cnName" value="融资系统"/><!-- 中文名称 -->
+		<entry key="enName" value="financing"/><!-- 英文名称 -->
+		<entry key="shortName" value="融资系统"/><!-- 中文简称 -->
+		<entry key="contextName" value="financing_front"/><!-- 部署在tomcat中的名称 -->
+		<entry key="serverPic" value="financing.gif"/><!-- 展示图片 -->
+		<entry key="serverPath" value=""/><!-- 服务地址 -->
+	</util:map>
+
+	<!-- E现货系统配置信息 -->
+	<util:map id="module23" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="isFirmset" value="Y"/><!-- 是否有前台菜单 -->
+		<entry key="cnName" value="现货管理系统"/><!-- 中文名称 -->
+		<entry key="enName" value="espot"/><!-- 英文名称 -->
+		<entry key="shortName" value="E现货"/><!-- 中文简称 -->
+		<entry key="contextName" value="espot_front"/><!-- 部署在tomcat中的名称 -->
+		<entry key="serverPic" value="espot.gif"/><!-- 展示图片 -->
+		<entry key="serverPath" value=""/><!-- 服务地址 -->
+	</util:map>
+	
+
+</beans>

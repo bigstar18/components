@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.trade.Holding" table="E_Holding" dynamic-insert="true" dynamic-update="true">
+		<id name="holdingID"/>
+		<property name="firmID"/>
+		<property name="bsFlag"/>
+		<property name="receive"/>
+		<property name="realMoney"/>
+		<property name="payMargin"/>
+		<property name="payGoodsMoney"/>
+		<property name="payoff"/>
+		<property name="transferMoney"/>
+		<property name="status"/>
+		<property name="breachApplyID"/>
+		<property name="offsetID"/>
+		<many-to-one name="belongtoTrade" column="tradeNO" class="gnnt.MEBS.espot.front.model.trade.Trade"/>
+	</class>
+</hibernate-mapping>

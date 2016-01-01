@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+    
+    
+<beans>
+	<!--配置文件中使用占位符-->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 数据库连接池  for 交易  -->
+	<bean autowire="default" class="org.apache.commons.dbcp.BasicDataSource" dependency-check="default" destroy-method="close" id="dataSource" lazy-init="default">
+		<property name="driverClassName">
+			<value>${trade.jdbc.driver}</value>
+		</property>
+		<property name="url">
+			<value>${trade.jdbc.url}</value>
+		</property>
+		<property name="username">
+			<value>${trade.jdbc.username}</value>
+		</property>
+		<property name="password">
+			<value>${trade.jdbc.password}</value>
+		</property>
+		<!--maxActive: 最大连接数量-->
+	    <property name="maxActive">
+	    	<value>800</value>
+	    </property>  
+	    <!--maxIdle: 最大空闲连接-->
+   		<property name="maxIdle">
+   			<value>80</value>
+   		</property>  
+   		<!--maxWait: 超时等待时间--> 
+   		<property name="maxWait">
+   			<value>25000</value>
+   		</property>  
+	</bean>
+	
+	<!-- 数据库连接池  for AU-->
+	<bean autowire="default" class="org.apache.commons.dbcp.BasicDataSource" dependency-check="default" destroy-method="close" id="auDataSource" lazy-init="default">
+		<property name="driverClassName">
+			<value>${au.jdbc.driver}</value>
+		</property>
+		<property name="url">
+			<value>${au.jdbc.url}</value>
+		</property>
+		<property name="username">
+			<value>${au.jdbc.username}</value>
+		</property>
+		<property name="password">
+			<value>${au.jdbc.password}</value>
+		</property>
+		<!--maxActive: 最大连接数量-->
+    	<property name="maxActive">
+    		<value>500</value>
+    	</property>  
+    	 <!--maxIdle: 最大空闲连接-->
+   		<property name="maxIdle">
+   			<value>20</value>
+   		</property>  
+   		<!--maxWait: 超时等待时间--> 
+   		<property name="maxWait">
+   			<value>120000</value>
+   		</property> 
+	</bean>
+
+	
+	<bean id="config" class="java.util.Properties">
+		<constructor-arg type="java.util.Properties">
+			<props>
+				<prop key="isCancelOrderAll">0</prop> <!--挤最后一笔单配置 0：挤掉部分(部分撤单)。1：挤掉全部(全部撤单)-->
+				
+				<!--AU配置-->
+				<!--0：rmi访问登录管理(默认为rmi访问) 1：本地访问登录管理  -->
+				<prop key="callMode">1</prop>	
+				<!-- 重连几次后到数据库重新获取连接 --> 
+				<prop key="clearRMITimes">3</prop> 
+				<!-- 验证登录超时线程睡眠时间，单位毫秒 -->
+				<prop key="timeSpace">200</prop>
+			</props>
+		</constructor-arg>
+	</bean>	
+	
+	<!-- AU 超时 类型配置MAp -->
+	<bean id="auExpireTimeMap" class="java.util.HashMap">
+      <constructor-arg>
+        <map>
+          <entry key="web">
+            <value type="java.lang.Long">7200000</value>
+          </entry>
+          <entry key="pc" >
+            <value type="java.lang.Long">30000</value>
+          </entry>
+          <entry key="mobile">
+            <value type="java.lang.Long">7200000</value>
+          </entry>
+        </map>
+      </constructor-arg>
+    </bean>
+	
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="dao" class="gnnt.MEBS.priceranking.server.dao.jdbc.BaseDAOJdbc">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="serverDAO"
+		class="gnnt.MEBS.priceranking.server.dao.jdbc.ServerDAOJdbc">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="tradeDAO"
+		class="gnnt.MEBS.priceranking.server.dao.jdbc.TradeDAOJdbc">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="server" class="gnnt.MEBS.priceranking.server.Server">
+	</bean>
+	
+
+</beans>
+
+
+
+
+
+
+
+
+
+
+

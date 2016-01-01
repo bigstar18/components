@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="gnnt.MEBS.vendue.mgr.model.firmSet.tradeAuthority.TradeAuthority" table="v_TradeAuthority" dynamic-update="true" lazy="false">
+         <composite-id name="key" class="gnnt.MEBS.vendue.mgr.model.firmSet.tradeAuthority.TradeAuthorityKey">
+            <key-property name="code"/>
+            <key-property name="userCode"/>
+        </composite-id>
+        <property name="ModifTime" />
+    </class>
+</hibernate-mapping>

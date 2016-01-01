@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.commodity.Property" table="M_Property">
+		<id name="propertyID"/>
+		<many-to-one name="belongtoCategory" column="categoryID" class="gnnt.MEBS.espot.front.model.commodity.Category"/>
+		<property name="propertyName"/>
+		<property name="hasValueDict"/>
+		<property name="searchable"/>
+		<property name="sortNo"/>
+		<property name="stockCheck"/>
+		<property name="isNecessary"/>
+		<property name="fieldType"/>
+		<property name="propertyTypeID"/>
+		<!-- <many-to-one name="propertyType" class="gnnt.MEBS.espot.front.model.commodity.PropertyType" insert="false" update="false"/> -->
+		<set name="containBreedProps" cascade="none" lazy="false" fetch="join" order-by="sortNo">
+			<key column="propertyID"/>
+			<one-to-many class="gnnt.MEBS.espot.front.model.commodity.BreedProps"/>
+		</set>
+	</class>
+</hibernate-mapping>

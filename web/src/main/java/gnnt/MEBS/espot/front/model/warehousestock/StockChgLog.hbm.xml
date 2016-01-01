@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.warehousestock.StockChgLog" table="BI_StockChgLog" dynamic-insert="true" dynamic-update="true">
+		<id name="id"/>
+		<property name="createTime"/>
+
+		<many-to-one name="belongtoStock" column="stockID" class="gnnt.MEBS.espot.front.model.warehousestock.Stock"/>
+		<many-to-one name="srcFirm" column="srcFirm" class="gnnt.MEBS.common.front.model.integrated.MFirm"/>
+		<many-to-one name="tarFirm" column="tarFirm" class="gnnt.MEBS.common.front.model.integrated.MFirm"/>
+	</class>
+</hibernate-mapping>

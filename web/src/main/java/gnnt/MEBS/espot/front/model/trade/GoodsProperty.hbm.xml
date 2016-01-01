@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.trade.GoodsProperty" table="E_GoodsProperty" dynamic-insert="true" dynamic-update="true">
+		<composite-id>
+			<key-many-to-one name="belongtoOrder" column="orderID" class="gnnt.MEBS.espot.front.model.trade.Order"/>
+			<key-property name="propertyName"/>
+		</composite-id>
+		<property name="propertyValue"/>
+		<property name="propertyTypeID"/>
+	</class>
+</hibernate-mapping>

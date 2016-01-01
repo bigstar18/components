@@ -1,0 +1,9 @@
+#!/bin/sh
+
+## 请将本脚本配置到该用户的开机启动
+
+## 例子
+
+# nohup checkd_one 172.16.10.125:1521:gnnt oracle mgr   > checkd_one.log &
+
+# nohup checkd     172.16.10.125:1521:gnnt oracle hqs 3 > checkd.log &

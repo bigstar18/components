@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="gnnt.MEBS.espot.front.model.warehousestock.StockOperation" table="BI_StockOperation" dynamic-insert="true" dynamic-update="true">
+		<composite-id>
+			<key-many-to-one name="belongtoStock" column="stockID" class="gnnt.MEBS.espot.front.model.warehousestock.Stock"/>
+			<key-property name="operationID"/>
+		</composite-id>
+	</class>
+</hibernate-mapping>

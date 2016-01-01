@@ -1,0 +1,4 @@
+#!/bin/sh
+## call by checkd
+
+# 请使用命令，或脚本的绝对路径
